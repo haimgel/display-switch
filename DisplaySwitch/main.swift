@@ -10,13 +10,45 @@ import Foundation
 import AppKit
 import DDC
 
-print("Hello, World!")
-var example = usbDelegate()
-CFRunLoopRun()
+class App: USBWatcherDelegate {
+    let config: Config
+    var usbWatcher: USBWatcher!
 
-/*
-for screen in NSScreen.screens{
-    debugPrint("========================================")
-    DDC(for: screen)?.write(command: .inputSelect, value: 16)
+    func switchDisplays() {
+        logger.infoMessage("Switching displays to \(config.monitorInput)")
+    }
+
+    func deviceAdded(_ device: io_object_t) {
+        guard let deviceName = device.name() else { return }
+        logger.debugMessage("Device '\(deviceName)' has been added")
+        if let name = device.name(), name.contains(config.usbDevice) {
+            switchDisplays()
+        }
+    }
+
+    func deviceRemoved(_ device: io_object_t) {
+        guard let deviceName = device.name() else { return }
+        logger.debugMessage("Device '\(deviceName)' has been removed")
+    }
+
+    func logConnectedDevices() {
+        for screen in NSScreen.screens {
+            guard let ddc = DDC(for: screen) else { continue }
+            logger.debugMessage("Detected screen \(ddc.edid())")
+        }
+    }
+
+    init() throws {
+        logger.infoMessage("Starting up")
+        config = try Config.load()
+        usbWatcher = USBWatcher(delegate: self)
+    }
+
+    func run() {
+        logConnectedDevices()
+        CFRunLoopRun()
+    }
 }
-*/
+
+let app = try App()
+app.run()

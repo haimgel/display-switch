@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		21D51EB324B947DD00D32864 /* DDC in Frameworks */ = {isa = PBXBuildFile; productRef = 21C64FED24B8C41C007081FF /* DDC */; };
-		21D51EB624B9481700D32864 /* TOMLDecoder in Frameworks */ = {isa = PBXBuildFile; productRef = 21D51EB524B9481700D32864 /* TOMLDecoder */; };
 		30BFD00BA7E3E22FC3BBAD9A /* UsbWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFD8B0BA55FDB4EC8435B1 /* UsbWatcher.swift */; };
+		30BFDB07CC2BE3DF80030310 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFD99D1EDAE22699E84733 /* config.swift */; };
 		30BFDC56D3E51B43EDAF4028 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFDFC5E9276E8E08C99520 /* main.swift */; };
+		30BFDD277A52B6C0FEE95C58 /* logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFD651B49769055C2656CA /* logger.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,7 +26,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		30BFD651B49769055C2656CA /* logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 		30BFD8B0BA55FDB4EC8435B1 /* UsbWatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsbWatcher.swift; sourceTree = "<group>"; };
+		30BFD99D1EDAE22699E84733 /* config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
 		30BFDE240E057E0789E4E89D /* DisplaySwitch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DisplaySwitch; sourceTree = BUILT_PRODUCTS_DIR; };
 		30BFDFC5E9276E8E08C99520 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -36,8 +38,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21D51EB324B947DD00D32864 /* DDC in Frameworks */,
-				21D51EB624B9481700D32864 /* TOMLDecoder in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +65,8 @@
 			children = (
 				30BFDFC5E9276E8E08C99520 /* main.swift */,
 				30BFD8B0BA55FDB4EC8435B1 /* UsbWatcher.swift */,
+				30BFD99D1EDAE22699E84733 /* config.swift */,
+				30BFD651B49769055C2656CA /* logger.swift */,
 			);
 			path = DisplaySwitch;
 			sourceTree = "<group>";
@@ -86,8 +88,9 @@
 			);
 			name = DisplaySwitch;
 			packageProductDependencies = (
-				21C64FED24B8C41C007081FF /* DDC */,
-				21D51EB524B9481700D32864 /* TOMLDecoder */,
+				21C64FED24B8C41C007081FF /* XCSwiftPackageProductDependency */,
+				21D51EB524B9481700D32864 /* XCSwiftPackageProductDependency */,
+				21CF6AA624B95AC0005E811A /* XCSwiftPackageProductDependency */,
 			);
 			productName = DisplaySwitch;
 			productReference = 30BFDE240E057E0789E4E89D /* DisplaySwitch */;
@@ -111,8 +114,9 @@
 			);
 			mainGroup = 30BFD3A1ADED4BBB109EF2BA;
 			packageReferences = (
-				21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference "DDC" */,
-				21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference "TOMLDecoder" */,
+				21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference */,
+				21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference */,
+				21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference */,
 			);
 			productRefGroup = 30BFDC793E08DC70085CBE86 /* Products */;
 			projectDirPath = "";
@@ -130,6 +134,8 @@
 			files = (
 				30BFDC56D3E51B43EDAF4028 /* main.swift in Sources */,
 				30BFD00BA7E3E22FC3BBAD9A /* UsbWatcher.swift in Sources */,
+				30BFDB07CC2BE3DF80030310 /* config.swift in Sources */,
+				30BFDD277A52B6C0FEE95C58 /* logger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,7 +295,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference "DDC" */ = {
+		21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/reitermarkus/DDC.swift";
 			requirement = {
@@ -297,7 +303,15 @@
 				kind = branch;
 			};
 		};
-		21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference "TOMLDecoder" */ = {
+		21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Nike-Inc/Willow.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+		21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dduan/TOMLDecoder";
 			requirement = {
@@ -308,14 +322,19 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		21C64FED24B8C41C007081FF /* DDC */ = {
+		21C64FED24B8C41C007081FF /* XCSwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference "DDC" */;
+			package = 21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference */;
 			productName = DDC;
 		};
-		21D51EB524B9481700D32864 /* TOMLDecoder */ = {
+		21CF6AA624B95AC0005E811A /* XCSwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference "TOMLDecoder" */;
+			package = 21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference */;
+			productName = Willow;
+		};
+		21D51EB524B9481700D32864 /* XCSwiftPackageProductDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference */;
 			productName = TOMLDecoder;
 		};
 /* End XCSwiftPackageProductDependency section */

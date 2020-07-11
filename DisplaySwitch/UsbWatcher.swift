@@ -26,8 +26,6 @@ public class USBWatcher {
     private var addedIterator: io_iterator_t = 0
     private var removedIterator: io_iterator_t = 0
 
-
-
     public init(delegate: USBWatcherDelegate) {
         self.delegate = delegate
 
@@ -87,22 +85,6 @@ extension io_object_t {
             }
             return nil
         }
-    }
-}
-
-class usbDelegate: USBWatcherDelegate {
-    private var usbWatcher: USBWatcher!
-    init() {
-        usbWatcher = USBWatcher(delegate: self)
-    }
-
-    func deviceAdded(_ device: io_object_t) {
-
-        print("device added: \(device.name() ?? "<unknown>")")
-    }
-
-    func deviceRemoved(_ device: io_object_t) {
-        print("device removed: \(device.name() ?? "<unknown>")")
     }
 }
 
