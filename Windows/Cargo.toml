@@ -1,0 +1,17 @@
+[package]
+name = "display_switch"
+version = "0.1.0"
+authors = ["Haim Gelfenbeyn <haim@g8n.me>"]
+edition = "2018"
+
+[dependencies]
+config = "0.10.1"
+dirs = "3.0.1"
+serde = { version = "1.0.114", features = ["derive"] }
+anyhow = "1.0.32"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["winuser", "libloaderapi"] }
+ddc = "0.2.2"
+ddc-winapi = "0.2.0"
+rusb = "0.6"
