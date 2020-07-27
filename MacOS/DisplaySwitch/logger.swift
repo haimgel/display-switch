@@ -9,6 +9,6 @@ import Willow
 public let logger = Logger(
         logLevels: [.all],
         writers: [
-            ConsoleWriter(),
+            ConsoleWriter(modifiers: [TimestampModifier()]),
             OSLogWriter(subsystem: "com.hageltech.DisplaySwitch", category: "utility")
         ])

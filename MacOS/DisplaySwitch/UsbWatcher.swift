@@ -6,6 +6,7 @@
 // Copied from (heavily inspired by):
 // https://stackoverflow.com/questions/52933325/detect-usb-devices-with-swift-4-on-macos
 
+import Foundation
 import IOKit
 import IOKit.usb
 import IOKit.usb.IOUSBLib
@@ -86,6 +87,22 @@ extension io_object_t {
             return nil
         }
     }
+
+    func info() -> NSDictionary? {
+        var serviceDictionary : Unmanaged<CFMutableDictionary>?
+        if IORegistryEntryCreateCFProperties(self, &serviceDictionary, kCFAllocatorDefault, 0) == KERN_SUCCESS {
+            if let info : NSDictionary = serviceDictionary?.takeRetainedValue() {
+                return info
+            }
+        }
+        return nil
+    }
+
+    func idString() -> String? {
+        guard let info = self.info(),
+              let vendorId = info.object(forKey: kUSBVendorID) as? Int16,
+              let productId = info.object(forKey: kUSBProductID) as? Int16
+              else { return nil }
+        return String(format: "%04x:%04x", vendorId, productId)
+    }
 }
-
-
