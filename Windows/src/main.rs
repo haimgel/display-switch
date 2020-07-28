@@ -1,18 +1,29 @@
-mod pnp_detect;
-mod display_control;
-mod usb_devices;
+#![windows_subsystem = "windows"]
+#[macro_use] extern crate log;
+
 mod configuration;
+mod display_control;
+mod logging;
+mod pnp_detect;
+mod usb_devices;
 
 fn main() {
+    logging::init_logging().unwrap();
     let config = configuration::Configuration::load().unwrap();
     let mut detector = usb_devices::UsbChangeDetector::new().unwrap();
-    print!("Starting up!\n");
     let pnp_detect = pnp_detect::PnPDetect::new(move || {
         let added_devices = detector.detect_added_devices().unwrap();
+        debug!("Detected device change. Added devices: {:?}", added_devices);
         if added_devices.contains(&config.usb_device) {
-            print!("Detected addition if device we're looking for");
-            display_control::switch_to(config.monitor_input);
+            info!("Detected device we're looking for {:?}", &config.usb_device);
+            display_control::wiggle_mouse();
+            display_control::switch_to(config.monitor_input).unwrap_or_else( |err| {
+                error!("Cannot switch monitor input: {:?}", err);
+            });
         }
+    });
+    display_control::log_current_source().unwrap_or_else( |err| {
+        error!("Cannot get monitor input: {:?}", err);
     });
     pnp_detect.detect();
 }

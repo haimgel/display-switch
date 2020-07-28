@@ -9,6 +9,8 @@ config = "0.10.1"
 dirs = "3.0.1"
 serde = { version = "1.0.114", features = ["derive"] }
 anyhow = "1.0.32"
+log = "0.4.11"
+simplelog = "0.8.0"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["winuser", "libloaderapi"] }
