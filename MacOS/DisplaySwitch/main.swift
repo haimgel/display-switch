@@ -1,9 +1,6 @@
 //
-//  main.swift
-//  DisplaySwitch
-//
-//  Created by Haim Gelfenbeyn on 2020-07-10.
-//  Copyright © 2020 Haim Gelfenbeyn. All rights reserved.
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
 import Foundation
