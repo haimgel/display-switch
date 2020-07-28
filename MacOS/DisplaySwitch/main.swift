@@ -11,7 +11,23 @@ class App: USBWatcherDelegate {
     let config: Config
     var mainLoopRunning = false
     var usbWatcher: USBWatcher!
+    var waker: Process!
 
+    // Wake the screens when switching, otherwise the screens will auto-switch back (if the input we're switching to
+    // is not active at the moment. There is probably a smarter way to do this,
+    // but "caffeinate" works and is documented.
+    func wakeDisplays() {
+        waker = Process()
+        waker.executableURL = URL(fileURLWithPath: "/usr/bin/caffeinate")
+        waker.arguments = ["-u", "-t 10"]
+        if (try? waker.run()) != nil {
+            logger.infoMessage("Waking the screens for 10 seconds")
+        } else {
+            logger.errorMessage("Couldn't run waker")
+        }
+    }
+
+    // Use DDC to switch all attached external monitors to a configured input
     func switchDisplays() {
         logger.infoMessage("Switching displays to \(config.monitorInput)")
         for screen in NSScreen.screens {
@@ -26,10 +42,13 @@ class App: USBWatcherDelegate {
         }
     }
 
+    // MARK: USBWatcherDelegate
+
     func deviceAdded(_ device: io_object_t) {
         guard mainLoopRunning, let deviceId = device.idString(), let deviceName = device.name() else { return }
         logger.debugMessage("Device '\(deviceId)' ('\(deviceName)') has been added")
         if deviceName.contains(config.usbDevice) || deviceId == config.usbDevice {
+            wakeDisplays()
             switchDisplays()
         }
     }
