@@ -1,11 +1,8 @@
-# Monitor auto-switching utility
+# Turn a $30 USB switch into a full-featured KVM
 
-This utility watches for USB device connect/disconnect events and switches monitor inputs via DDC according to
-the configuration. 
-
-I'm using a USB switch that connects my keyboard/mouse/webcam to two separate computers. This little utility turns it
-into a full KVM: when the USB input is switched, this utility detects the newly connected device and switches all 
-external monitors to the inputs that correspond to this computer.
+This utility watches for USB device connect/disconnect events and switches monitor inputs via DDC/CI. This turns
+a simple USB switch into a full-fledged KVM solution: press one button on your USB switch and all your monitors
+connect to a different input.
 
 It is supposed to be installed on all computers that could be connected to these monitors, since the app only switches
 monitors "one way" and relies on itself running on the other computers to switch it "the other way" as needed.
@@ -39,7 +36,6 @@ If your monitor has an USB-C port, it's usually reported as `DisplaySwitch2`
 On MacOS: the log file is written to the system log.
 On WindowS: the log file is written to `/Users/USERNAME/AppData/Local/display-switch/display-switch.log`
 
-## Running on startup
+## Building from source, running on startup
 
-This exercise is left to the reader :-)
-
+These exercises are left to the reader for now :-)

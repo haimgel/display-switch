@@ -10,5 +10,5 @@ public let logger = Logger(
         logLevels: [.all],
         writers: [
             ConsoleWriter(modifiers: [TimestampModifier()]),
-            OSLogWriter(subsystem: "com.hageltech.DisplaySwitch", category: "utility")
+            OSLogWriter(subsystem: "dev.haim.display-switch", category: "utility")
         ])

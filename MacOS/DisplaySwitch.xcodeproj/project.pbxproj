@@ -102,7 +102,7 @@
 		30BFDE3DD3C15BAC356188DA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				ORGANIZATIONNAME = "Hagel Technologies Ltd.";
+				ORGANIZATIONNAME = "Haim Gelfenbeyn";
 			};
 			buildConfigurationList = 30BFDE469016527CEFA316E1 /* Build configuration list for PBXProject "DisplaySwitch" */;
 			compatibilityVersion = "Xcode 3.2";
