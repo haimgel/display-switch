@@ -36,6 +36,24 @@ If your monitor has an USB-C port, it's usually reported as `DisplaySwitch2`
 On MacOS: the log file is written to the system log.
 On WindowS: the log file is written to `/Users/USERNAME/AppData/Local/display-switch/display-switch.log`
 
-## Building from source, running on startup
+## Building from source
 
-These exercises are left to the reader for now :-)
+### Windows
+
+[Install Rust](https://www.rust-lang.org/tools/install), then do `cargo build --release` from inside Windows directory.
+
+### MacOS
+
+TODO
+
+## Running on startup
+
+### Windows
+
+Copy `display_switch.exe` from `target\release` (where it was built in the previous step) to 
+`C:\Users\Username\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` (replace Username with your 
+Windows user name).
+
+### MacOS
+
+TODO
