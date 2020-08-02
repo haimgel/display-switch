@@ -1,14 +1,19 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
+use anyhow::{anyhow, Result};
 use config;
 use dirs;
 use serde::Deserialize;
-use anyhow::{anyhow, Result};
 
 use crate::display_control;
 
 #[derive(Debug, Deserialize)]
 pub struct Configuration {
     pub usb_device: String,
-    pub monitor_input: display_control::InputSource
+    pub monitor_input: display_control::InputSource,
 }
 
 impl Configuration {
@@ -19,7 +24,10 @@ impl Configuration {
             .merge(config::File::from(config_file_name.to_path_buf()))?
             .merge(config::Environment::with_prefix("DISPLAY_SWITCH"))?;
         let config = settings.try_into::<Self>()?;
-        info!("Configuration loaded ({:?}): {:?}", config_file_name, config);
+        info!(
+            "Configuration loaded ({:?}): {:?}",
+            config_file_name, config
+        );
         Ok(config)
     }
 

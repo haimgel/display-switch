@@ -1,29 +1,44 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
 use std::ffi::OsStr;
 use std::iter::once;
 use std::os::windows::ffi::OsStrExt;
+
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::ntdef::LPCWSTR;
-use winapi::shared::windef::{HWND, HICON, HBRUSH, HCURSOR};
+use winapi::shared::windef::{HBRUSH, HCURSOR, HICON, HWND};
 use winapi::um::libloaderapi::GetModuleHandleW;
 use winapi::um::winuser::{
-    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, SetWindowLongPtrW, GetWindowLongPtrW,
-    PostQuitMessage, RegisterClassW, TranslateMessage, MSG, WM_CREATE, WM_DESTROY,
-    WM_DEVICECHANGE, WNDCLASSW, GWLP_USERDATA,
+    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetWindowLongPtrW,
+    PostQuitMessage, RegisterClassW, SetWindowLongPtrW, TranslateMessage, GWLP_USERDATA, MSG,
+    WM_CREATE, WM_DESTROY, WM_DEVICECHANGE, WNDCLASSW,
 };
 
-pub struct PnPDetect<F> where F: FnMut() {
+pub struct PnPDetect<F>
+where
+    F: FnMut(),
+{
     hwnd: HWND,
-    callback: F
+    callback: F,
 }
 
-impl<F> PnPDetect<F> where F: FnMut() {
+impl<F> PnPDetect<F>
+where
+    F: FnMut(),
+{
     pub fn new(callback: F) -> Self {
-        let mut pnp_detect = PnPDetect { hwnd: std::ptr::null_mut(), callback };
+        let mut pnp_detect = PnPDetect {
+            hwnd: std::ptr::null_mut(),
+            callback,
+        };
         pnp_detect.create_window();
-        return pnp_detect
+        return pnp_detect;
     }
 
-    pub fn detect(&self)  {
+    pub fn detect(&self) {
         unsafe {
             let mut msg: MSG = std::mem::MaybeUninit::zeroed().assume_init();
             loop {

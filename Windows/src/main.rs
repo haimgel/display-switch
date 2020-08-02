@@ -1,5 +1,11 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
 #![windows_subsystem = "windows"]
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 mod configuration;
 mod display_control;
@@ -17,12 +23,12 @@ fn main() {
         if added_devices.contains(&config.usb_device) {
             info!("Detected device we're looking for {:?}", &config.usb_device);
             display_control::wiggle_mouse();
-            display_control::switch_to(config.monitor_input).unwrap_or_else( |err| {
+            display_control::switch_to(config.monitor_input).unwrap_or_else(|err| {
                 error!("Cannot switch monitor input: {:?}", err);
             });
         }
     });
-    display_control::log_current_source().unwrap_or_else( |err| {
+    display_control::log_current_source().unwrap_or_else(|err| {
         error!("Cannot get monitor input: {:?}", err);
     });
     pnp_detect.detect();

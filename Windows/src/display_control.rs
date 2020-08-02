@@ -1,10 +1,16 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
+use std::thread::sleep;
+
 use anyhow::Result;
 use ddc::Ddc;
 use ddc_winapi::Monitor;
 use serde::Deserialize;
-use winapi::um::winuser::{mouse_event, MOUSEEVENTF_MOVE};
-use std::thread::sleep;
 use winapi::_core::time::Duration;
+use winapi::um::winuser::{mouse_event, MOUSEEVENTF_MOVE};
 
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
