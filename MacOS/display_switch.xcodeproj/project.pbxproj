@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21D4F15224D871E200464FAD /* DDC in Frameworks */ = {isa = PBXBuildFile; productRef = 21C64FED24B8C41C007081FF /* DDC */; };
+		21D4F15324D871E200464FAD /* TOMLDecoder in Frameworks */ = {isa = PBXBuildFile; productRef = 21D51EB524B9481700D32864 /* TOMLDecoder */; };
+		21D4F15424D871E200464FAD /* Willow in Frameworks */ = {isa = PBXBuildFile; productRef = 21CF6AA624B95AC0005E811A /* Willow */; };
 		30BFD00BA7E3E22FC3BBAD9A /* UsbWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFD8B0BA55FDB4EC8435B1 /* UsbWatcher.swift */; };
 		30BFDB07CC2BE3DF80030310 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFD99D1EDAE22699E84733 /* config.swift */; };
 		30BFDC56D3E51B43EDAF4028 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30BFDFC5E9276E8E08C99520 /* main.swift */; };
@@ -29,7 +32,7 @@
 		30BFD651B49769055C2656CA /* logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 		30BFD8B0BA55FDB4EC8435B1 /* UsbWatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsbWatcher.swift; sourceTree = "<group>"; };
 		30BFD99D1EDAE22699E84733 /* config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
-		30BFDE240E057E0789E4E89D /* DisplaySwitch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DisplaySwitch; sourceTree = BUILT_PRODUCTS_DIR; };
+		30BFDE240E057E0789E4E89D /* display_switch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = display_switch; sourceTree = BUILT_PRODUCTS_DIR; };
 		30BFDFC5E9276E8E08C99520 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -38,6 +41,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				21D4F15224D871E200464FAD /* DDC in Frameworks */,
+				21D4F15424D871E200464FAD /* Willow in Frameworks */,
+				21D4F15324D871E200464FAD /* TOMLDecoder in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -48,19 +54,19 @@
 			isa = PBXGroup;
 			children = (
 				30BFDC793E08DC70085CBE86 /* Products */,
-				30BFDCC4D8E6EB991EADD982 /* DisplaySwitch */,
+				30BFDCC4D8E6EB991EADD982 /* src */,
 			);
 			sourceTree = "<group>";
 		};
 		30BFDC793E08DC70085CBE86 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				30BFDE240E057E0789E4E89D /* DisplaySwitch */,
+				30BFDE240E057E0789E4E89D /* display_switch */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		30BFDCC4D8E6EB991EADD982 /* DisplaySwitch */ = {
+		30BFDCC4D8E6EB991EADD982 /* src */ = {
 			isa = PBXGroup;
 			children = (
 				30BFDFC5E9276E8E08C99520 /* main.swift */,
@@ -68,15 +74,15 @@
 				30BFD99D1EDAE22699E84733 /* config.swift */,
 				30BFD651B49769055C2656CA /* logger.swift */,
 			);
-			path = DisplaySwitch;
+			path = src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		30BFD8E7019767BBB5C0A2C9 /* DisplaySwitch */ = {
+		30BFD8E7019767BBB5C0A2C9 /* display_switch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 30BFD02E4D12FEED9E22F021 /* Build configuration list for PBXNativeTarget "DisplaySwitch" */;
+			buildConfigurationList = 30BFD02E4D12FEED9E22F021 /* Build configuration list for PBXNativeTarget "display_switch" */;
 			buildPhases = (
 				30BFD341016E00DD1ADB1B9B /* Sources */,
 				30BFD0A0DB17CFB7C8F0DCE6 /* Frameworks */,
@@ -86,14 +92,14 @@
 			);
 			dependencies = (
 			);
-			name = DisplaySwitch;
+			name = display_switch;
 			packageProductDependencies = (
-				21C64FED24B8C41C007081FF /* XCSwiftPackageProductDependency */,
-				21D51EB524B9481700D32864 /* XCSwiftPackageProductDependency */,
-				21CF6AA624B95AC0005E811A /* XCSwiftPackageProductDependency */,
+				21C64FED24B8C41C007081FF /* DDC */,
+				21D51EB524B9481700D32864 /* TOMLDecoder */,
+				21CF6AA624B95AC0005E811A /* Willow */,
 			);
-			productName = DisplaySwitch;
-			productReference = 30BFDE240E057E0789E4E89D /* DisplaySwitch */;
+			productName = display_switch;
+			productReference = 30BFDE240E057E0789E4E89D /* display_switch */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -104,7 +110,7 @@
 			attributes = {
 				ORGANIZATIONNAME = "Haim Gelfenbeyn";
 			};
-			buildConfigurationList = 30BFDE469016527CEFA316E1 /* Build configuration list for PBXProject "DisplaySwitch" */;
+			buildConfigurationList = 30BFDE469016527CEFA316E1 /* Build configuration list for PBXProject "display_switch" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -114,15 +120,15 @@
 			);
 			mainGroup = 30BFD3A1ADED4BBB109EF2BA;
 			packageReferences = (
-				21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference */,
-				21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference */,
-				21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference */,
+				21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference "DDC" */,
+				21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference "TOMLDecoder" */,
+				21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference "Willow" */,
 			);
 			productRefGroup = 30BFDC793E08DC70085CBE86 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				30BFD8E7019767BBB5C0A2C9 /* DisplaySwitch */,
+				30BFD8E7019767BBB5C0A2C9 /* display_switch */,
 			);
 		};
 /* End PBXProject section */
@@ -274,7 +280,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		30BFD02E4D12FEED9E22F021 /* Build configuration list for PBXNativeTarget "DisplaySwitch" */ = {
+		30BFD02E4D12FEED9E22F021 /* Build configuration list for PBXNativeTarget "display_switch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				30BFDE1FB39F84BF8923CE29 /* Debug */,
@@ -283,7 +289,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		30BFDE469016527CEFA316E1 /* Build configuration list for PBXProject "DisplaySwitch" */ = {
+		30BFDE469016527CEFA316E1 /* Build configuration list for PBXProject "display_switch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				30BFDADDBD3DF3270F49678B /* Debug */,
@@ -295,7 +301,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference */ = {
+		21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference "DDC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/reitermarkus/DDC.swift";
 			requirement = {
@@ -303,7 +309,7 @@
 				kind = branch;
 			};
 		};
-		21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference */ = {
+		21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference "Willow" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Nike-Inc/Willow.git";
 			requirement = {
@@ -311,7 +317,7 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference */ = {
+		21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference "TOMLDecoder" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/dduan/TOMLDecoder";
 			requirement = {
@@ -322,19 +328,19 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		21C64FED24B8C41C007081FF /* XCSwiftPackageProductDependency */ = {
+		21C64FED24B8C41C007081FF /* DDC */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference */;
+			package = 21C64FEC24B8C41C007081FF /* XCRemoteSwiftPackageReference "DDC" */;
 			productName = DDC;
 		};
-		21CF6AA624B95AC0005E811A /* XCSwiftPackageProductDependency */ = {
+		21CF6AA624B95AC0005E811A /* Willow */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference */;
+			package = 21CF6AA524B95AC0005E811A /* XCRemoteSwiftPackageReference "Willow" */;
 			productName = Willow;
 		};
-		21D51EB524B9481700D32864 /* XCSwiftPackageProductDependency */ = {
+		21D51EB524B9481700D32864 /* TOMLDecoder */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference */;
+			package = 21D51EB424B9481700D32864 /* XCRemoteSwiftPackageReference "TOMLDecoder" */;
 			productName = TOMLDecoder;
 		};
 /* End XCSwiftPackageProductDependency section */
