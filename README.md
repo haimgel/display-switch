@@ -44,7 +44,8 @@ On WindowS: the log file is written to `/Users/USERNAME/AppData/Local/display-sw
 
 ### MacOS
 
-TODO
+[Install Xcode](https://developer.apple.com/xcode/), then do
+`xcodebuild -scheme display_switch -configuration release -derivedDataPath .build build` from inside MacOS directory.
 
 ## Running on startup
 
@@ -56,4 +57,9 @@ Windows user name).
 
 ### MacOS
 
-TODO
+```bash
+  # Get your INI file in order! (see above)
+  cp .build/Build/Products/Release/display_switch /usr/local/bin
+  cp dev.haim.display-switch.daemon.plist ~/Library/LaunchAgents/
+  launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
+```
