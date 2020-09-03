@@ -1,3 +1,5 @@
+![build](https://github.com/haimgel/display-switch/workflows/build/badge.svg)
+
 # Turn a $30 USB switch into a full-featured KVM
 
 This utility watches for USB device connect/disconnect events and switches monitor inputs via DDC/CI. This turns
