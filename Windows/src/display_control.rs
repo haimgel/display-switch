@@ -17,10 +17,8 @@ const INPUT_SELECT: u8 = 0x60;
 
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub enum InputSource {
-    DisplayPort1 = 0x0f,
-    DisplayPort2 = 0x10,
+    DisplayPort1 = 0xf,
     Hdmi1 = 0x11,
-    Hdmi2 = 0x12,
 }
 
 pub fn log_current_source() -> Result<()> {

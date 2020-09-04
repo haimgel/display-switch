@@ -13,7 +13,8 @@ use crate::display_control;
 #[derive(Debug, Deserialize)]
 pub struct Configuration {
     pub usb_device: String,
-    pub monitor_input: display_control::InputSource,
+    pub monitor_input_added: display_control::InputSource,
+    pub monitor_input_removed: display_control::InputSource,
 }
 
 impl Configuration {
