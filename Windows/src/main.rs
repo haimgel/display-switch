@@ -23,9 +23,10 @@ fn main() {
         if added_devices.contains(&config.usb_device) {
             info!("Detected device we're looking for {:?}", &config.usb_device);
             display_control::wiggle_mouse();
-            display_control::switch_to(config.monitor_input).unwrap_or_else(|err| {
-                error!("Cannot switch monitor input: {:?}", err);
-            });
+            display_control::switch_to(config.monitor_input, &config.monitor_input_map)
+                .unwrap_or_else(|err| {
+                    error!("Cannot switch monitor input: {:?}", err);
+                });
         }
     });
     display_control::log_current_source().unwrap_or_else(|err| {

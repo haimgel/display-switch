@@ -3,7 +3,7 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
-use std::thread::sleep;
+use std::{collections::HashMap, thread::sleep};
 
 use anyhow::Result;
 use ddc::Ddc;
@@ -31,10 +31,21 @@ pub fn log_current_source() -> Result<()> {
     Ok(())
 }
 
-pub fn switch_to(source: InputSource) -> Result<()> {
+pub fn switch_to(
+    default_source: InputSource,
+    source_map: &Option<HashMap<String, InputSource>>,
+) -> Result<()> {
     for mut ddc in Monitor::enumerate()? {
+        let handle_str: usize = ddc.handle() as *const _ as usize;
+        let handle_str = format!("{:x}", handle_str);
+
+        let source = source_map
+            .as_ref()
+            .and_then(|m| m.get(&handle_str))
+            .unwrap_or(&default_source);
+
         info!("Setting monitor '{:?}' to {:?}", ddc, source);
-        ddc.set_vcp_feature(INPUT_SELECT, source as u16)?;
+        ddc.set_vcp_feature(INPUT_SELECT, *source as u16)?;
     }
     Ok(())
 }
