@@ -20,12 +20,12 @@ impl DdcControlTrait for DdcControlMacos {
         let source = unsafe { ddcReadInputSelect(display_idx) };
         if source > 0 {
             info!(
-                "Monitor '{:?}' is currently set to 0x{:x}",
+                "Display '{:?}' is currently set to 0x{:x}",
                 display_idx, source
             );
             Ok(source as u16)
         } else {
-            error!("Failed to get current input for monitor '{:?}'", display_idx);
+            error!("Failed to get current input for display '{:?}'", display_idx);
             Err(anyhow!("DDC error"))
         }
     }
@@ -33,10 +33,10 @@ impl DdcControlTrait for DdcControlMacos {
     fn ddc_write_input_select(display_idx: isize, source: u16) -> Result<()> {
         let result = unsafe { ddcWriteInputSelect(display_idx, source) };
         if result {
-            info!("Monitor '{:?}' set to 0x{:x}", display_idx, source);
+            info!("Display '{:?}' set to 0x{:x}", display_idx, source);
             Ok(())
         } else {
-            error!("Failed to set monitor '{:?}' to 0x{:x}", display_idx, source);
+            error!("Failed to set display '{:?}' to 0x{:x}", display_idx, source);
             Err(anyhow!("DDC error"))
         }
     }
