@@ -28,9 +28,7 @@ impl usb_callback::UsbCallback for App {
                 &self.config.usb_device
             );
             platform::wake_screens();
-            display_control::switch_to(self.config.monitor_input).unwrap_or_else(|err| {
-                error!("Cannot switch monitor input: {:?}", err);
-            });
+            display_control::switch_to(self.config.monitor_input);
         }
     }
 

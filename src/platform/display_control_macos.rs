@@ -3,8 +3,6 @@ use anyhow::{anyhow, Result};
 
 pub struct DDCControlMacos();
 
-impl DDCControlMacos {}
-
 extern "C" {
     fn ddcWriteInputSelect(screen_idx: isize, input: u16) -> bool;
     fn ddcReadInputSelect(screen_idx: isize) -> isize;

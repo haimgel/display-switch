@@ -21,18 +21,16 @@ pub trait DDCControl {
     fn ddc_write_input_select(screen_idx: isize, value: u16) -> Result<()>;
 }
 
-pub fn log_current_source() -> Result<()> {
+#[allow(unused_must_use)]
+pub fn log_current_source() {
     for display in DDCControlImpl::get_display_range() {
-        #[allow(unused_must_use)]
         DDCControlImpl::ddc_read_input_select(display);
     }
-    Ok(())
 }
 
-pub fn switch_to(source: InputSource) -> Result<()> {
+#[allow(unused_must_use)]
+pub fn switch_to(source: InputSource) {
     for display in DDCControlImpl::get_display_range() {
-        #[allow(unused_must_use)]
         DDCControlImpl::ddc_write_input_select(display, source as u16);
     }
-    Ok(())
 }

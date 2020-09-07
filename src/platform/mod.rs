@@ -14,7 +14,7 @@ pub use pnp_detect_libusb::PnPDetect;
 #[cfg(target_os = "linux")]
 mod display_control_ddc_hi;
 #[cfg(target_os = "linux")]
-pub use display_control_ddc_hi as display_control;
+pub use display_control_ddc_hi::DDCControlDdcHi as DDCControlImpl;
 
 #[cfg(target_os = "windows")]
 mod pnp_detect_windows;
@@ -23,7 +23,7 @@ pub use pnp_detect_windows::PnPDetect;
 #[cfg(target_os = "windows")]
 mod display_control_ddc_hi;
 #[cfg(target_os = "windows")]
-pub use display_control_ddc_hi as display_control;
+pub use display_control_ddc_hi::DDCControlDdcHi as DDCControlImpl;
 
 mod wake_screens;
 pub use wake_screens::wake_screens;

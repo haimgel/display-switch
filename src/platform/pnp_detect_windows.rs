@@ -9,7 +9,7 @@ use std::iter::once;
 use std::os::windows::ffi::OsStrExt;
 
 use crate::usb_callback::{device2str, UsbCallback};
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::ntdef::LPCWSTR;
 use winapi::shared::windef::{HBRUSH, HCURSOR, HICON, HWND};
@@ -30,7 +30,7 @@ impl PnPDetect {
     pub fn new(callback: Box<dyn UsbCallback>) -> Self {
         let mut pnp_detect = Self {
             callback,
-            current_devices: Self::read_device_list()?,
+            current_devices: Self::read_device_list().unwrap_or_default(),
             hwnd: std::ptr::null_mut(),
         };
         pnp_detect.create_window();
@@ -38,7 +38,13 @@ impl PnPDetect {
     }
 
     fn handle_hotplug_event(&mut self) {
-        let new_devices = Self::read_device_list()?;
+        let new_devices = match Self::read_device_list() {
+            Ok(devices) => devices,
+            Err(err) => {
+                error!("Cannot get a list of USB devices: {:?}", err);
+                return;
+            }
+        };
         let added_devices = &new_devices - &self.current_devices;
         let removed_devices = &self.current_devices - &new_devices;
         for device in added_devices.iter() {
@@ -54,7 +60,7 @@ impl PnPDetect {
     fn read_device_list() -> Result<HashSet<String>> {
         Ok(rusb::devices()?
             .iter()
-            .map(|device| usb_callback::device2str(device))
+            .map(|device| device2str(device).ok_or(anyhow!("Cannot get device Ids")))
             .collect::<std::result::Result<_, _>>()?)
     }
 
