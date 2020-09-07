@@ -3,10 +3,13 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use std::collections::HashSet;
 use std::ffi::OsStr;
 use std::iter::once;
 use std::os::windows::ffi::OsStrExt;
 
+use crate::usb_callback::{device2str, UsbCallback};
+use anyhow::Result;
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::ntdef::LPCWSTR;
 use winapi::shared::windef::{HBRUSH, HCURSOR, HICON, HWND};
@@ -17,27 +20,45 @@ use winapi::um::winuser::{
     WM_CREATE, WM_DESTROY, WM_DEVICECHANGE, WNDCLASSW,
 };
 
-pub struct PnPDetect<F>
-where
-    F: FnMut(),
-{
+pub struct PnPDetect {
     hwnd: HWND,
-    callback: F,
+    callback: Box<dyn UsbCallback>,
+    current_devices: HashSet<String>,
 }
 
-impl<F> PnPDetect<F>
-where
-    F: FnMut(),
-{
-    pub fn new(callback: F) -> Self {
-        let mut pnp_detect = PnPDetect {
-            hwnd: std::ptr::null_mut(),
+impl PnPDetect {
+    pub fn new(callback: Box<dyn UsbCallback>) -> Self {
+        let mut pnp_detect = Self {
             callback,
+            current_devices: Self::read_device_list()?,
+            hwnd: std::ptr::null_mut(),
         };
         pnp_detect.create_window();
         return pnp_detect;
     }
 
+    fn handle_hotplug_event(&mut self) {
+        let new_devices = Self::read_device_list()?;
+        let added_devices = &new_devices - &self.current_devices;
+        let removed_devices = &self.current_devices - &new_devices;
+        for device in added_devices.iter() {
+            self.callback.device_added(&device);
+        }
+        for device in removed_devices.iter() {
+            self.callback.device_removed(&device);
+        }
+        self.current_devices = new_devices;
+    }
+
+    /// Get a list of currently connected USB devices
+    fn read_device_list() -> Result<HashSet<String>> {
+        Ok(rusb::devices()?
+            .iter()
+            .map(|device| usb_callback::device2str(device))
+            .collect::<std::result::Result<_, _>>()?)
+    }
+
+    /// Detect USB events: just run a Windows event loop
     pub fn detect(&self) {
         unsafe {
             let mut msg: MSG = std::mem::MaybeUninit::zeroed().assume_init();
@@ -53,7 +74,7 @@ where
         }
     }
 
-    // Window procedure function to handle events
+    /// Window procedure function to handle events
     pub unsafe extern "system" fn window_proc(
         hwnd: HWND,
         msg: UINT,
@@ -72,16 +93,17 @@ where
             WM_DEVICECHANGE => {
                 let self_ptr = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Self;
                 let window_state: &mut Self = self_ptr.as_mut().unwrap();
-                (window_state.callback)();
+                window_state.handle_hotplug_event();
             }
             _ => return DefWindowProcW(hwnd, msg, wparam, lparam),
         }
         return 0;
     }
 
+    /// Create an invisible window to handle WM_DEVICECHANGE message
     fn create_window(&mut self) {
         unsafe {
-            let winapi_class_name: Vec<u16> = OsStr::new("Sample Window Class 22")
+            let winapi_class_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindowClass")
                 .encode_wide()
                 .chain(once(0))
                 .collect();
@@ -103,7 +125,7 @@ where
             let error_code = RegisterClassW(&wc);
             assert_ne!(error_code, 0, "failed to register the window class");
 
-            let window_name: Vec<u16> = OsStr::new("Rust Win32 window 22")
+            let window_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindow")
                 .encode_wide()
                 .chain(once(0))
                 .collect();

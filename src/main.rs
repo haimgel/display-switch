@@ -10,26 +10,52 @@ extern crate log;
 mod configuration;
 mod display_control;
 mod logging;
-mod pnp_detect;
-mod usb_devices;
 
-fn main() {
-    logging::init_logging().unwrap();
-    let config = configuration::Configuration::load().unwrap();
-    let mut detector = usb_devices::UsbChangeDetector::new().unwrap();
-    let pnp_detect = pnp_detect::PnPDetect::new(move || {
-        let added_devices = detector.detect_added_devices().unwrap();
-        debug!("Detected device change. Added devices: {:?}", added_devices);
-        if added_devices.contains(&config.usb_device) {
-            info!("Detected device we're looking for {:?}", &config.usb_device);
-            display_control::wiggle_mouse();
-            display_control::switch_to(config.monitor_input).unwrap_or_else(|err| {
+mod platform;
+mod usb_callback;
+use platform::PnPDetect;
+
+struct App {
+    config: configuration::Configuration,
+}
+
+impl usb_callback::UsbCallback for App {
+    fn device_added(&self, device_id: &str) {
+        debug!("Detected device change. Added device: {:?}", device_id);
+        if device_id == self.config.usb_device {
+            info!(
+                "Detected device we're looking for {:?}",
+                &self.config.usb_device
+            );
+            platform::wake_screens();
+            display_control::switch_to(self.config.monitor_input).unwrap_or_else(|err| {
                 error!("Cannot switch monitor input: {:?}", err);
             });
         }
-    });
-    display_control::log_current_source().unwrap_or_else(|err| {
-        error!("Cannot get monitor input: {:?}", err);
-    });
-    pnp_detect.detect();
+    }
+
+    fn device_removed(&self, device_id: &str) {
+        debug!("Detected device change. Removed device: {:?}", device_id);
+    }
+}
+
+impl App {
+    pub fn new() -> Self {
+        let app = Self {
+            config: configuration::Configuration::load().unwrap(),
+        };
+        logging::init_logging().unwrap();
+        return app;
+    }
+
+    pub fn run(self) {
+        display_control::log_current_source();
+        let pnp_detector = PnPDetect::new(Box::new(self));
+        pnp_detector.detect();
+    }
+}
+
+fn main() {
+    let app = App::new();
+    app.run();
 }

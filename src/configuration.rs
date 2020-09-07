@@ -32,9 +32,12 @@ impl Configuration {
     }
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
+        #[cfg(target_os = "windows")]
         let config_dir = dirs::config_dir()
             .ok_or(anyhow!("Config directory not found"))?
             .join("display-switch");
+        #[cfg(not(target_os = "windows"))]
+        let config_dir = dirs::preference_dir().ok_or(anyhow!("Config directory not found"))?;
         std::fs::create_dir_all(&config_dir)?;
         Ok(config_dir.join("display-switch.ini"))
     }
