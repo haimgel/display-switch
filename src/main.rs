@@ -27,7 +27,7 @@ impl usb::UsbCallback for App {
                 "Detected device we're looking for {:?}",
                 &self.config.usb_device
             );
-            platform::wake_screens();
+            platform::wake_displays();
             display_control::switch_to(self.config.monitor_input);
         }
     }

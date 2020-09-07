@@ -25,5 +25,5 @@ mod display_control_ddc_hi;
 #[cfg(target_os = "windows")]
 pub use display_control_ddc_hi::DdcControlDdcHi as DdcControl;
 
-mod wake_screens;
-pub use wake_screens::wake_screens;
+mod wake_displays;
+pub use wake_displays::wake_displays;

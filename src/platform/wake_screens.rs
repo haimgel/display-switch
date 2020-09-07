@@ -1,6 +1,6 @@
 #[cfg(target_os = "windows")]
 /// Move a mouse a little bit, this causes the displays to wake up
-pub fn wake_screens() {
+pub fn wake_displays() {
     use std::{thread, time};
     use winapi::um::winuser::{mouse_event, MOUSEEVENTF_MOVE};
 
@@ -12,11 +12,11 @@ pub fn wake_screens() {
 }
 
 #[cfg(target_os = "macos")]
-pub fn wake_screens() {
+pub fn wake_displays() {
     // TODO
 }
 
 #[cfg(target_os = "linux")]
-pub fn wake_screens() {
+pub fn wake_displays() {
     // TODO
 }
