@@ -1,11 +1,14 @@
-use crate::usb_callback::{device2str, UsbCallback};
+use crate::usb::{device2str, UsbCallback};
 use rusb::{Context, Device, UsbContext};
+use anyhow::{anyhow, Result};
 
-pub struct PnPDetect {
+/// Detection of plugged in / removed USB devices: uses "libusb" and should work on Linux
+/// and MacOS, but not on Windows: libusb does not support hotplug on Windows.
+pub struct PnPDetectLibusb {
     callback: Box<dyn UsbCallback>,
 }
 
-impl<T: UsbContext> rusb::Hotplug<T> for PnPDetect {
+impl<T: UsbContext> rusb::Hotplug<T> for PnPDetectLibusb {
     fn device_arrived(&mut self, device: Device<T>) {
         device2str(device).map(|str| self.callback.device_added(&str));
     }
@@ -15,12 +18,12 @@ impl<T: UsbContext> rusb::Hotplug<T> for PnPDetect {
     }
 }
 
-impl PnPDetect {
+impl PnPDetectLibusb {
     pub fn new(callback: Box<dyn UsbCallback>) -> Self {
-        PnPDetect { callback }
+        PnPDetectLibusb { callback }
     }
 
-    pub fn detect(self) {
+    pub fn detect(self) -> Result<()> {
         if rusb::has_hotplug() {
             let context = Context::new().unwrap();
             context
@@ -28,9 +31,10 @@ impl PnPDetect {
                 .unwrap();
             loop {
                 context.handle_events(None).unwrap();
-            }
+            };
         } else {
-            panic!("libusb hotplug api unsupported");
+            // This should never happen: hotplug is supported on Linux and MacOS both.
+            Err(anyhow!("libusb hotplug api unsupported"))
         }
     }
 }

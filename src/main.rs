@@ -12,14 +12,14 @@ mod display_control;
 mod logging;
 
 mod platform;
-mod usb_callback;
+mod usb;
 use platform::PnPDetect;
 
 struct App {
     config: configuration::Configuration,
 }
 
-impl usb_callback::UsbCallback for App {
+impl usb::UsbCallback for App {
     fn device_added(&self, device_id: &str) {
         debug!("Detected device change. Added device: {:?}", device_id);
         if device_id == self.config.usb_device {
@@ -49,7 +49,7 @@ impl App {
     pub fn run(self) {
         display_control::log_current_source();
         let pnp_detector = PnPDetect::new(Box::new(self));
-        pnp_detector.detect();
+        pnp_detector.detect().unwrap();
     }
 }
 

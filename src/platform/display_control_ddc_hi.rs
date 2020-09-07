@@ -1,8 +1,9 @@
-use crate::display_control::DDCControl;
+use crate::display_control::DdcControlTrait;
 use anyhow::{anyhow, Result};
 use ddc_hi::{Ddc, Display};
 
-pub struct DDCControlDdcHi();
+/// Controls the displays via "ddc-hi" crate: should support Windows and Linux.
+pub struct DdcControlDdcHi();
 
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
@@ -21,7 +22,7 @@ fn display_name(display: &Display, screen_idx: isize) -> String {
     format!("'{}' #{}", display.info.id, screen_idx)
 }
 
-impl DDCControl for DDCControlDdcHi {
+impl DdcControlTrait for DdcControlDdcHi {
     fn get_display_range() -> std::ops::Range<isize> {
         0..Display::enumerate().len() as isize
     }

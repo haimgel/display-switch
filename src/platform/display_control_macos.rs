@@ -1,15 +1,17 @@
-use crate::display_control::DDCControl;
+use crate::display_control::DdcControlTrait;
 use anyhow::{anyhow, Result};
 
-pub struct DDCControlMacos();
+/// Controls the displays via "DDC.Swift" on MacOS.
+pub struct DdcControlMacos();
 
+/// These are exported by the Swift code in mac_ddc/src/mac_ddc.swift
 extern "C" {
     fn ddcWriteInputSelect(screen_idx: isize, input: u16) -> bool;
     fn ddcReadInputSelect(screen_idx: isize) -> isize;
     fn getDisplayCount() -> isize;
 }
 
-impl DDCControl for DDCControlMacos {
+impl DdcControlTrait for DdcControlMacos {
     fn get_display_range() -> std::ops::Range<isize> {
         unsafe { 0..getDisplayCount() }
     }

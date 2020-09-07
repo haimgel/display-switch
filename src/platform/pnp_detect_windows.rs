@@ -8,7 +8,7 @@ use std::ffi::OsStr;
 use std::iter::once;
 use std::os::windows::ffi::OsStrExt;
 
-use crate::usb_callback::{device2str, UsbCallback};
+use crate::usb::{device2str, UsbCallback, PnPDetectTrait};
 use anyhow::{anyhow, Result};
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::ntdef::LPCWSTR;
@@ -20,13 +20,16 @@ use winapi::um::winuser::{
     WM_CREATE, WM_DESTROY, WM_DEVICECHANGE, WNDCLASSW,
 };
 
-pub struct PnPDetect {
+/// Detection of plugged in / removed USB devices on Windows: listens for WM_DEVICECHANGE messages.
+/// This code should be removed once libusb supports hotplug notifications on Windows:
+/// https://github.com/libusb/libusb/issues/86
+pub struct PnPDetectWindows {
     hwnd: HWND,
     callback: Box<dyn UsbCallback>,
     current_devices: HashSet<String>,
 }
 
-impl PnPDetect {
+impl PnPDetectWindows {
     pub fn new(callback: Box<dyn UsbCallback>) -> Self {
         let mut pnp_detect = Self {
             callback,
@@ -65,7 +68,7 @@ impl PnPDetect {
     }
 
     /// Detect USB events: just run a Windows event loop
-    pub fn detect(&self) {
+    pub fn detect(&self) -> Result<()> {
         unsafe {
             let mut msg: MSG = std::mem::MaybeUninit::zeroed().assume_init();
             loop {
@@ -78,6 +81,7 @@ impl PnPDetect {
                 }
             }
         }
+        Ok(())
     }
 
     /// Window procedure function to handle events
