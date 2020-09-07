@@ -16,6 +16,7 @@ pub struct App {
 }
 
 impl usb::UsbCallback for App {
+    #[allow(unused_must_use)]
     fn device_added(&self, device_id: &str) {
         debug!("Detected device change. Added device: {:?}", device_id);
         if device_id == self.config.usb_device {
@@ -23,7 +24,9 @@ impl usb::UsbCallback for App {
                 "Detected device we're looking for {:?}",
                 &self.config.usb_device
             );
-            wake_displays();
+            std::thread::spawn(|| {
+                wake_displays().map_err(|err| error!("{:?}", err));
+            });
             display_control::switch_to(self.config.monitor_input);
         }
     }
