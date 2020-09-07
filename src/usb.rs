@@ -1,3 +1,7 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
 use rusb::UsbContext;
 
 pub fn device2str<T: UsbContext>(device: rusb::Device<T>) -> Option<String> {

@@ -1,3 +1,8 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
 use crate::usb::{device2str, UsbCallback};
 use rusb::{Context, Device, UsbContext};
 use anyhow::{anyhow, Result};

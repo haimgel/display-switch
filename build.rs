@@ -1,3 +1,8 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
 use serde::Deserialize;
 use std::env;
 use std::process::Command;

@@ -1,3 +1,8 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
 #[cfg(target_os = "macos")]
 mod pnp_detect_libusb;
 #[cfg(target_os = "macos")]

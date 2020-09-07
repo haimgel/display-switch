@@ -1,3 +1,8 @@
+//
+// Copyright © 2020 Haim Gelfenbeyn
+// This code is licensed under MIT license (see LICENSE.txt for details)
+//
+
 use crate::display_control::DdcControlTrait;
 use anyhow::{anyhow, Result};
 use ddc_hi::{Ddc, Display};
