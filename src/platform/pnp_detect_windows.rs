@@ -8,7 +8,7 @@ use std::ffi::OsStr;
 use std::iter::once;
 use std::os::windows::ffi::OsStrExt;
 
-use crate::usb::{device2str, UsbCallback, PnPDetectTrait};
+use crate::usb::{device2str, UsbCallback};
 use anyhow::{anyhow, Result};
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::ntdef::LPCWSTR;

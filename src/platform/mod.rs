@@ -19,7 +19,7 @@ pub use display_control_ddc_hi::DdcControlDdcHi as DdcControl;
 #[cfg(target_os = "windows")]
 mod pnp_detect_windows;
 #[cfg(target_os = "windows")]
-pub use pnp_detect_libusb::PnPDetectWindows as PnPDetect;
+pub use pnp_detect_windows::PnPDetectWindows as PnPDetect;
 #[cfg(target_os = "windows")]
 mod display_control_ddc_hi;
 #[cfg(target_os = "windows")]
