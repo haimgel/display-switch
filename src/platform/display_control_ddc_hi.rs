@@ -8,18 +8,18 @@ pub struct DdcControlDdcHi();
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
 
-fn ddc_for(screen_idx: isize) -> Result<Display> {
+fn ddc_for(display_idx: isize) -> Result<Display> {
     let mut displays = Display::enumerate();
-    if (screen_idx >= 0) && ((screen_idx as usize) < displays.len()) {
-        Ok(displays.remove(screen_idx as usize))
+    if (display_idx >= 0) && ((display_idx as usize) < displays.len()) {
+        Ok(displays.remove(display_idx as usize))
     } else {
         Err(anyhow!("Monitor not found"))
     }
 }
 
-fn display_name(display: &Display, screen_idx: isize) -> String {
+fn display_name(display: &Display, display_idx: isize) -> String {
     // TODO: Verify that formatting here makes sense on Linux as well
-    format!("'{}' #{}", display.info.id, screen_idx)
+    format!("'{}' #{}", display.info.id, display_idx)
 }
 
 impl DdcControlTrait for DdcControlDdcHi {
@@ -27,9 +27,9 @@ impl DdcControlTrait for DdcControlDdcHi {
         0..Display::enumerate().len() as isize
     }
 
-    fn ddc_read_input_select(screen_idx: isize) -> Result<u16> {
-        let mut display = ddc_for(screen_idx)?;
-        let display_name = display_name(&display, screen_idx);
+    fn ddc_read_input_select(display_idx: isize) -> Result<u16> {
+        let mut display = ddc_for(display_idx)?;
+        let display_name = display_name(&display, display_idx);
         match display.handle.get_vcp_feature(INPUT_SELECT) {
             Ok(source) => {
                 info!(
@@ -49,9 +49,9 @@ impl DdcControlTrait for DdcControlDdcHi {
         }
     }
 
-    fn ddc_write_input_select(screen_idx: isize, source: u16) -> Result<()> {
-        let mut display = ddc_for(screen_idx)?;
-        let display_name = display_name(&display, screen_idx);
+    fn ddc_write_input_select(display_idx: isize, source: u16) -> Result<()> {
+        let mut display = ddc_for(display_idx)?;
+        let display_name = display_name(&display, display_idx);
         debug!("Setting monitor '{}' to 0x{:x}", display_name, source);
         match display.handle.set_vcp_feature(INPUT_SELECT, source) {
             Ok(_) => {

@@ -6,8 +6,8 @@ pub struct DdcControlMacos();
 
 /// These are exported by the Swift code in mac_ddc/src/mac_ddc.swift
 extern "C" {
-    fn ddcWriteInputSelect(screen_idx: isize, input: u16) -> bool;
-    fn ddcReadInputSelect(screen_idx: isize) -> isize;
+    fn ddcWriteInputSelect(display_idx: isize, input: u16) -> bool;
+    fn ddcReadInputSelect(display_idx: isize) -> isize;
     fn getDisplayCount() -> isize;
 }
 
@@ -16,27 +16,27 @@ impl DdcControlTrait for DdcControlMacos {
         unsafe { 0..getDisplayCount() }
     }
 
-    fn ddc_read_input_select(screen_idx: isize) -> Result<u16> {
-        let source = unsafe { ddcReadInputSelect(screen_idx) };
+    fn ddc_read_input_select(display_idx: isize) -> Result<u16> {
+        let source = unsafe { ddcReadInputSelect(display_idx) };
         if source > 0 {
             info!(
                 "Monitor '{:?}' is currently set to 0x{:x}",
-                screen_idx, source
+                display_idx, source
             );
             Ok(source as u16)
         } else {
-            error!("Failed to get current input for monitor '{:?}'", screen_idx);
+            error!("Failed to get current input for monitor '{:?}'", display_idx);
             Err(anyhow!("DDC error"))
         }
     }
 
-    fn ddc_write_input_select(screen_idx: isize, source: u16) -> Result<()> {
-        let result = unsafe { ddcWriteInputSelect(screen_idx, source) };
+    fn ddc_write_input_select(display_idx: isize, source: u16) -> Result<()> {
+        let result = unsafe { ddcWriteInputSelect(display_idx, source) };
         if result {
-            info!("Monitor '{:?}' set to 0x{:x}", screen_idx, source);
+            info!("Monitor '{:?}' set to 0x{:x}", display_idx, source);
             Ok(())
         } else {
-            error!("Failed to set monitor '{:?}' to 0x{:x}", screen_idx, source);
+            error!("Failed to set monitor '{:?}' to 0x{:x}", display_idx, source);
             Err(anyhow!("DDC error"))
         }
     }
