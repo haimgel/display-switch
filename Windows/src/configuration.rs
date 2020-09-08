@@ -16,7 +16,8 @@ use std::collections::HashMap;
 pub struct Configuration {
     pub usb_device: String,
     pub monitor_input: display_control::InputSource,
-    pub monitor_input_map: Option<HashMap<String, display_control::InputSource>>,
+    pub on_connect: Option<HashMap<String, display_control::InputSource>>,
+    pub on_disconnect: Option<HashMap<String, display_control::InputSource>>,
 }
 
 impl Configuration {

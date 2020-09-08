@@ -18,12 +18,22 @@ fn main() {
     let config = configuration::Configuration::load().unwrap();
     let mut detector = usb_devices::UsbChangeDetector::new().unwrap();
     let pnp_detect = pnp_detect::PnPDetect::new(move || {
-        let added_devices = detector.detect_added_devices().unwrap();
-        debug!("Detected device change. Added devices: {:?}", added_devices);
-        if added_devices.contains(&config.usb_device) {
-            info!("Detected device we're looking for {:?}", &config.usb_device);
+        let changed_devices = detector.detect_changed_devices().unwrap();
+        let added = changed_devices.added;
+        let removed = changed_devices.removed;
+        debug!("Detected device change. Added devices: {:?}", added);
+        if added.contains(&config.usb_device) {
+            info!("Connect detected for monitored device: {:?}", &config.usb_device);
             display_control::wiggle_mouse();
-            display_control::switch_to(config.monitor_input, &config.monitor_input_map)
+            display_control::switch_to(config.monitor_input, &config.on_connect)
+                .unwrap_or_else(|err| {
+                    error!("Cannot switch monitor input: {:?}", err);
+                });
+        }
+
+        if removed.contains(&config.usb_device) {
+            info!("Disconnect detected for monitored device: {:?}", &config.usb_device);
+            display_control::switch_to(config.monitor_input, &config.on_disconnect)
                 .unwrap_or_else(|err| {
                     error!("Cannot switch monitor input: {:?}", err);
                 });

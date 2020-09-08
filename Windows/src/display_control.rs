@@ -6,7 +6,7 @@
 use std::{collections::HashMap, thread::sleep};
 
 use anyhow::Result;
-use ddc::Ddc;
+use ddc::{Ddc, DdcHost};
 use ddc_winapi::Monitor;
 use serde::Deserialize;
 use winapi::_core::time::Duration;
@@ -36,6 +36,7 @@ pub fn switch_to(
     source_map: &Option<HashMap<String, InputSource>>,
 ) -> Result<()> {
     for mut ddc in Monitor::enumerate()? {
+        ddc.sleep();
         let handle_str: usize = ddc.handle() as *const _ as usize;
         let handle_str = format!("{:x}", handle_str);
 
