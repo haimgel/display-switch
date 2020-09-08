@@ -2,6 +2,8 @@
 // Copyright © 2020 Haim Gelfenbeyn
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
+#![windows_subsystem = "windows"]
+
 #[macro_use]
 extern crate log;
 

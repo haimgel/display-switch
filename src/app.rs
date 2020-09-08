@@ -3,8 +3,6 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
-#![windows_subsystem = "windows"]
-
 use crate::configuration::Configuration;
 use crate::display_control;
 use crate::logging;
