@@ -12,13 +12,12 @@ monitors "one way" and relies on itself running on the other computers to switch
  
 ## Platforms supported
 
-The app is written twice: once for MacOS (in Swift) and once for Windows (in Rust). The idea is dead simple, but I
-haven't found good cross-platform support for DDC, USB, device plug-n-play and power management in any one language
-except C, and I didn't want to write this in C.
+The app should function on MacOS and Windows. Linux support is planned in a future release. Most of the code is in
+Rust, with the exception of DDC support on MacOS, which is done via statically-linked Swift library.
 
 ## Configuration
 
-The configuration is pretty similar on both platforms:
+The configuration is pretty similar on all platforms:
 
 On MacOS: the configuration file is expected in `~/Library/Preferences/display-switch.ini`
 On Windows: the configuration file is expected in `/Users/USERNAME/AppData/Roaming/display-switch/display-switch.ini`
@@ -36,19 +35,19 @@ If your monitor has an USB-C port, it's usually reported as `DisplayPort2`
 
 ## Logging
 
-On MacOS: the log file is written to the system log.
-On WindowS: the log file is written to `/Users/USERNAME/AppData/Local/display-switch/display-switch.log`
+* On MacOS: the log file is written to `/Users/USERNAME/Library/Logs/display-switch/display-switch.log`
+* On WindowS: the log file is written to `/Users/USERNAME/AppData/Local/display-switch/display-switch.log`
 
 ## Building from source
 
 ### Windows
 
-[Install Rust](https://www.rust-lang.org/tools/install), then do `cargo build --release` from inside Windows directory.
+[Install Rust](https://www.rust-lang.org/tools/install), then do `cargo build --release`
 
 ### MacOS
 
-[Install Xcode](https://developer.apple.com/xcode/), then do
-`xcodebuild -scheme display_switch -configuration release -derivedDataPath .build build` from inside MacOS directory.
+[Install Xcode](https://developer.apple.com/xcode/), [install Rust](https://www.rust-lang.org/tools/install), then do
+`cargo build --release` 
 
 ## Running on startup
 
@@ -62,7 +61,7 @@ Windows user name).
 
 ```bash
   # Get your INI file in order! (see above)
-  cp .build/Build/Products/Release/display_switch /usr/local/bin
+  cp target/release/display_switch /usr/local/bin
   cp dev.haim.display-switch.daemon.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
 ```
