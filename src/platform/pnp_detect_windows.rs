@@ -3,10 +3,13 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use std::collections::HashSet;
 use std::ffi::OsStr;
 use std::iter::once;
 use std::os::windows::ffi::OsStrExt;
 
+use crate::usb::{device2str, UsbCallback};
+use anyhow::{anyhow, Result};
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::ntdef::LPCWSTR;
 use winapi::shared::windef::{HBRUSH, HCURSOR, HICON, HWND};
@@ -17,28 +20,55 @@ use winapi::um::winuser::{
     WM_CREATE, WM_DESTROY, WM_DEVICECHANGE, WNDCLASSW,
 };
 
-pub struct PnPDetect<F>
-where
-    F: FnMut(),
-{
+/// Detection of plugged in / removed USB devices on Windows: listens for WM_DEVICECHANGE messages.
+/// This code should be removed once libusb supports hotplug notifications on Windows:
+/// https://github.com/libusb/libusb/issues/86
+pub struct PnPDetectWindows {
     hwnd: HWND,
-    callback: F,
+    callback: Box<dyn UsbCallback>,
+    current_devices: HashSet<String>,
 }
 
-impl<F> PnPDetect<F>
-where
-    F: FnMut(),
-{
-    pub fn new(callback: F) -> Self {
-        let mut pnp_detect = PnPDetect {
-            hwnd: std::ptr::null_mut(),
+impl PnPDetectWindows {
+    pub fn new(callback: Box<dyn UsbCallback>) -> Self {
+        let mut pnp_detect = Self {
             callback,
+            current_devices: Self::read_device_list().unwrap_or_default(),
+            hwnd: std::ptr::null_mut(),
         };
         pnp_detect.create_window();
         return pnp_detect;
     }
 
-    pub fn detect(&self) {
+    fn handle_hotplug_event(&mut self) {
+        let new_devices = match Self::read_device_list() {
+            Ok(devices) => devices,
+            Err(err) => {
+                error!("Cannot get a list of USB devices: {:?}", err);
+                return;
+            }
+        };
+        let added_devices = &new_devices - &self.current_devices;
+        let removed_devices = &self.current_devices - &new_devices;
+        for device in added_devices.iter() {
+            self.callback.device_added(&device);
+        }
+        for device in removed_devices.iter() {
+            self.callback.device_removed(&device);
+        }
+        self.current_devices = new_devices;
+    }
+
+    /// Get a list of currently connected USB devices
+    fn read_device_list() -> Result<HashSet<String>> {
+        Ok(rusb::devices()?
+            .iter()
+            .map(|device| device2str(device).ok_or(anyhow!("Cannot get device Ids")))
+            .collect::<std::result::Result<_, _>>()?)
+    }
+
+    /// Detect USB events: just run a Windows event loop
+    pub fn detect(&self) -> Result<()> {
         unsafe {
             let mut msg: MSG = std::mem::MaybeUninit::zeroed().assume_init();
             loop {
@@ -51,9 +81,10 @@ where
                 }
             }
         }
+        Ok(())
     }
 
-    // Window procedure function to handle events
+    /// Window procedure function to handle events
     pub unsafe extern "system" fn window_proc(
         hwnd: HWND,
         msg: UINT,
@@ -72,16 +103,17 @@ where
             WM_DEVICECHANGE => {
                 let self_ptr = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Self;
                 let window_state: &mut Self = self_ptr.as_mut().unwrap();
-                (window_state.callback)();
+                window_state.handle_hotplug_event();
             }
             _ => return DefWindowProcW(hwnd, msg, wparam, lparam),
         }
         return 0;
     }
 
+    /// Create an invisible window to handle WM_DEVICECHANGE message
     fn create_window(&mut self) {
         unsafe {
-            let winapi_class_name: Vec<u16> = OsStr::new("Sample Window Class 22")
+            let winapi_class_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindowClass")
                 .encode_wide()
                 .chain(once(0))
                 .collect();
@@ -103,7 +135,7 @@ where
             let error_code = RegisterClassW(&wc);
             assert_ne!(error_code, 0, "failed to register the window class");
 
-            let window_name: Vec<u16> = OsStr::new("Rust Win32 window 22")
+            let window_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindow")
                 .encode_wide()
                 .chain(once(0))
                 .collect();

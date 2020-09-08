@@ -5,27 +5,17 @@ on: [push]
 jobs:
   build_mac:
     runs-on: macos-latest
-
-    defaults:
-      run:
-        working-directory: MacOS
-
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: xcodebuild -scheme display_switch -configuration release -derivedDataPath .build build
+        run: cargo build --verbose --release
       - uses: actions/upload-artifact@v1
         with:
           name: mac
-          path: MacOS/.build/Build/Products/release/display_switch
+          path: target/release/display_switch
 
   build_windows:
     runs-on: windows-latest
-
-    defaults:
-      run:
-        working-directory: Windows
-
     steps:
       - uses: actions/checkout@v2
       - name: Build
@@ -35,4 +25,4 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: windows
-          path: Windows/target/release/display_switch.exe
+          path: target/release/display_switch.exe
