@@ -6,12 +6,13 @@
 use anyhow::{anyhow, Result};
 use config;
 use dirs;
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 
 use crate::display_control;
 
 #[derive(Debug, Deserialize)]
 pub struct Configuration {
+    #[serde(deserialize_with = "Configuration::deserialize_usb_device")]
     pub usb_device: String,
     pub monitor_input: display_control::InputSource,
 }
@@ -29,6 +30,14 @@ impl Configuration {
             config_file_name, config
         );
         Ok(config)
+    }
+
+    fn deserialize_usb_device<'de, D>(deserializer: D) -> Result<String, D::Error>
+        where
+            D: Deserializer<'de>,
+    {
+        let s: String = Deserialize::deserialize(deserializer)?;
+        Ok(s.to_lowercase())
     }
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
@@ -66,11 +75,25 @@ impl Configuration {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use config::FileFormat::Toml;
 
     #[test]
     fn test_log_file_name() {
         let file_name = Configuration::log_file_name();
         assert!(file_name.is_ok());
         assert!(file_name.unwrap().ends_with("display-switch.log"))
+    }
+
+    const TEST_CONFIG_FILE :&str = r#"
+        usb_device = "dead:BEEF"
+        monitor_input = "DisplayPort2"
+    "#;
+
+    #[test]
+    fn test_usb_device_deserialization() {
+        let mut settings = config::Config::default();
+        settings.merge(config::File::from_str(TEST_CONFIG_FILE, Toml)).unwrap();
+        let config = settings.try_into::<Configuration>().unwrap();
+        assert_eq!(config.usb_device, "dead:beef")
     }
 }
