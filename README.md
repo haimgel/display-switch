@@ -65,3 +65,19 @@ Windows user name).
   cp dev.haim.display-switch.daemon.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
 ```
+
+## Finding your usb information on a Mac
+
+On a Mac...install [home-brew](https://brew.sh). Use a regular keyboard not attached to the faux kvm.
+
+Open a terminal.
+
+```$ brew install lsusb
+
+$ lsusb > a
+
+$ lsusb > b
+$ opendiff a b
+```
+
+The lines that are highlighted should show you which usb ID to pay attention to.
