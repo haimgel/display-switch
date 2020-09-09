@@ -22,7 +22,7 @@ impl DdcControlTrait for DdcControlMacos {
     }
 
     fn ddc_read_input_select(display_idx: isize) -> Result<u16> {
-        let source = unsafe { ddcReadInputSelect(display_idx) };
+       let source = unsafe { ddcReadInputSelect(display_idx) };
         if source > 0 {
             info!(
                 "Display '{:?}' is currently set to 0x{:x}",

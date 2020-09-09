@@ -14,6 +14,7 @@ use crate::display_control;
 pub struct Configuration {
     pub usb_device: String,
     pub monitor_input: display_control::InputSource,
+    pub monitor_other: display_control::InputSource,
 }
 
 impl Configuration {
