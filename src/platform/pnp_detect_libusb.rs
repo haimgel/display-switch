@@ -35,7 +35,9 @@ impl PnPDetectLibusb {
                 .register_callback(None, None, None, Box::new(self))
                 .unwrap();
             loop {
-                context.handle_events(None).unwrap();
+                if let Err(err) = context.handle_events(None) {
+                    error!("Error during USB errors handling: {:?}", err)
+                };
             };
         } else {
             // This should never happen: hotplug is supported on Linux and MacOS both.
