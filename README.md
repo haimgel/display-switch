@@ -31,7 +31,8 @@ Configuration file settings:
 
 `usb_device` is which USB device to watch (vendor id / device id in hex), and `monitor_input` is which monitor input
 to switch to, when this device is connected. Supported values are `Hdmi1`, `Hdmi2`, `DisplayPort1`, `DisplayPort2`
-If your monitor has an USB-C port, it's usually reported as `DisplayPort2`
+If your monitor has an USB-C port, it's usually reported as `DisplayPort2`. Input can also be specified as a "raw"
+decimal or hexadecimal value: `monitor_input = 0x10`
 
 ## Logging
 
