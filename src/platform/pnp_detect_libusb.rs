@@ -4,8 +4,8 @@
 //
 
 use crate::usb::{device2str, UsbCallback};
-use rusb::{Context, Device, UsbContext};
 use anyhow::{anyhow, Result};
+use rusb::{Context, Device, UsbContext};
 
 /// Detection of plugged in / removed USB devices: uses "libusb" and should work on Linux
 /// and MacOS, but not on Windows: libusb does not support hotplug on Windows.
@@ -38,7 +38,7 @@ impl PnPDetectLibusb {
                 if let Err(err) = context.handle_events(None) {
                     error!("Error during USB errors handling: {:?}", err)
                 };
-            };
+            }
         } else {
             // This should never happen: hotplug is supported on Linux and MacOS both.
             Err(anyhow!("libusb hotplug api unsupported"))

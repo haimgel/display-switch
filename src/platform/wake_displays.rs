@@ -21,17 +21,24 @@ pub fn wake_displays() -> Result<()> {
 #[cfg(target_os = "macos")]
 pub fn wake_displays() -> Result<()> {
     use std::process::Command;
-    match Command::new("/usr/bin/caffeinate").args(&["-u", "-t", "10"]).status() {
+    match Command::new("/usr/bin/caffeinate")
+        .args(&["-u", "-t", "10"])
+        .status()
+    {
         Ok(status) => {
             if status.success() {
                 Ok(())
             } else {
-                Err(anyhow!("Couldn't wake displays, 'caffeinate' returned {:?}", status.code()))
+                Err(anyhow!(
+                    "Couldn't wake displays, 'caffeinate' returned {:?}",
+                    status.code()
+                ))
             }
-        },
-        Err(err) => {
-            Err(anyhow!("Couldn't wake displays, couldn't run 'caffeinate': {}", err))
         }
+        Err(err) => Err(anyhow!(
+            "Couldn't wake displays, couldn't run 'caffeinate': {}",
+            err
+        )),
     }
 }
 

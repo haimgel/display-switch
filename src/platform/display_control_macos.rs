@@ -30,7 +30,10 @@ impl DdcControlTrait for DdcControlMacos {
             );
             Ok(source as u16)
         } else {
-            error!("Failed to get current input for display '{:?}'", display_idx);
+            error!(
+                "Failed to get current input for display '{:?}'",
+                display_idx
+            );
             Err(anyhow!("DDC error"))
         }
     }
@@ -41,7 +44,10 @@ impl DdcControlTrait for DdcControlMacos {
             info!("Display '{:?}' set to 0x{:x}", display_idx, source);
             Ok(())
         } else {
-            error!("Failed to set display '{:?}' to 0x{:x}", display_idx, source);
+            error!(
+                "Failed to set display '{:?}' to 0x{:x}",
+                display_idx, source
+            );
             Err(anyhow!("DDC error"))
         }
     }

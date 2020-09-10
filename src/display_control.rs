@@ -5,8 +5,8 @@
 
 use crate::platform::DdcControl;
 use anyhow::Result;
-use serde::{Deserialize, Deserializer};
 use serde::de::Error;
+use serde::{Deserialize, Deserializer};
 
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub enum SymbolicInputSource {
@@ -26,8 +26,8 @@ pub enum InputSource {
 
 impl InputSource {
     fn deserialize_raw<'de, D>(deserializer: D) -> Result<u16, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         let str = String::deserialize(deserializer)?.trim().to_lowercase();
         let result;
@@ -36,9 +36,7 @@ impl InputSource {
         } else {
             result = u16::from_str_radix(&str, 10);
         }
-        result.map_err({|err|
-            D::Error::custom(format!("{:?}", err))
-        })
+        result.map_err({ |err| D::Error::custom(format!("{:?}", err)) })
     }
 
     pub fn value(self) -> u16 {

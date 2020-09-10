@@ -6,7 +6,7 @@
 use crate::configuration::Configuration;
 use crate::display_control;
 use crate::logging;
-use crate::platform::{PnPDetect, wake_displays};
+use crate::platform::{wake_displays, PnPDetect};
 use crate::usb;
 
 pub struct App {
@@ -54,4 +54,3 @@ impl App {
         pnp_detector.detect().unwrap();
     }
 }
-

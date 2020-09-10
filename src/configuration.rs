@@ -33,8 +33,8 @@ impl Configuration {
     }
 
     fn deserialize_usb_device<'de, D>(deserializer: D) -> Result<String, D::Error>
-        where
-            D: Deserializer<'de>,
+    where
+        D: Deserializer<'de>,
     {
         let s: String = Deserialize::deserialize(deserializer)?;
         Ok(s.to_lowercase())
@@ -42,12 +42,9 @@ impl Configuration {
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
         #[cfg(target_os = "macos")]
-        let config_dir =
-            dirs::preference_dir()
-            .ok_or(anyhow!("Config directory not found"))?;
+        let config_dir = dirs::preference_dir().ok_or(anyhow!("Config directory not found"))?;
         #[cfg(target_os = "windows")]
-        let config_dir =
-            dirs::config_dir()
+        let config_dir = dirs::config_dir()
             .ok_or(anyhow!("Config directory not found"))?
             .join("display-switch");
         std::fs::create_dir_all(&config_dir)?;
@@ -56,15 +53,13 @@ impl Configuration {
 
     pub fn log_file_name() -> Result<std::path::PathBuf> {
         #[cfg(target_os = "macos")]
-        let log_dir =
-            dirs::home_dir()
+        let log_dir = dirs::home_dir()
             .ok_or(anyhow!("Home directory not found"))?
             .join("Library")
             .join("Logs")
             .join("display-switch");
         #[cfg(target_os = "windows")]
-        let log_dir =
-            dirs::data_local_dir()
+        let log_dir = dirs::data_local_dir()
             .ok_or(anyhow!("Data-local directory not found"))?
             .join("display-switch");
         std::fs::create_dir_all(&log_dir)?;
@@ -75,8 +70,8 @@ impl Configuration {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use config::FileFormat::Ini;
     use config::ConfigError;
+    use config::FileFormat::Ini;
     //use crate::display_control::{InputSource, SymbolicInputSource};
     //use crate::display_control::InputSource::Symbolic;
 
@@ -89,43 +84,57 @@ mod tests {
 
     fn load_test_config(config_str: &str) -> Result<Configuration, ConfigError> {
         let mut settings = config::Config::default();
-        settings.merge(config::File::from_str(config_str, Ini)).unwrap();
+        settings
+            .merge(config::File::from_str(config_str, Ini))
+            .unwrap();
         settings.try_into::<Configuration>()
     }
 
     #[test]
     fn test_usb_device_deserialization() {
-        let config = load_test_config(r#"
+        let config = load_test_config(
+            r#"
             usb_device = "dead:BEEF"
             monitor_input = "DisplayPort2"
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
         assert_eq!(config.usb_device, "dead:beef")
     }
 
     #[test]
     fn test_symbolic_input_deserialization() {
-        let config = load_test_config(r#"
+        let config = load_test_config(
+            r#"
             usb_device = "dead:BEEF"
             monitor_input = "DisplayPort2"
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
         assert_eq!(config.monitor_input.value(), 0x10);
     }
 
     #[test]
     fn test_decimal_input_deserialization() {
-        let config = load_test_config(r#"
+        let config = load_test_config(
+            r#"
             usb_device = "dead:BEEF"
             monitor_input = 22
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
         assert_eq!(config.monitor_input.value(), 22);
     }
 
     #[test]
     fn test_hexadecimal_input_deserialization() {
-        let config = load_test_config(r#"
+        let config = load_test_config(
+            r#"
             usb_device = "dead:BEEF"
             monitor_input = "0x10"
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
         assert_eq!(config.monitor_input.value(), 16);
     }
 }
