@@ -75,7 +75,10 @@ impl Configuration {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use config::FileFormat::Toml;
+    use config::FileFormat::Ini;
+    use config::ConfigError;
+    //use crate::display_control::{InputSource, SymbolicInputSource};
+    //use crate::display_control::InputSource::Symbolic;
 
     #[test]
     fn test_log_file_name() {
@@ -84,16 +87,45 @@ mod tests {
         assert!(file_name.unwrap().ends_with("display-switch.log"))
     }
 
-    const TEST_CONFIG_FILE :&str = r#"
-        usb_device = "dead:BEEF"
-        monitor_input = "DisplayPort2"
-    "#;
+    fn load_test_config(config_str: &str) -> Result<Configuration, ConfigError> {
+        let mut settings = config::Config::default();
+        settings.merge(config::File::from_str(config_str, Ini)).unwrap();
+        settings.try_into::<Configuration>()
+    }
 
     #[test]
     fn test_usb_device_deserialization() {
-        let mut settings = config::Config::default();
-        settings.merge(config::File::from_str(TEST_CONFIG_FILE, Toml)).unwrap();
-        let config = settings.try_into::<Configuration>().unwrap();
+        let config = load_test_config(r#"
+            usb_device = "dead:BEEF"
+            monitor_input = "DisplayPort2"
+        "#).unwrap();
         assert_eq!(config.usb_device, "dead:beef")
+    }
+
+    #[test]
+    fn test_symbolic_input_deserialization() {
+        let config = load_test_config(r#"
+            usb_device = "dead:BEEF"
+            monitor_input = "DisplayPort2"
+        "#).unwrap();
+        assert_eq!(config.monitor_input.value(), 0x10);
+    }
+
+    #[test]
+    fn test_decimal_input_deserialization() {
+        let config = load_test_config(r#"
+            usb_device = "dead:BEEF"
+            monitor_input = 22
+        "#).unwrap();
+        assert_eq!(config.monitor_input.value(), 22);
+    }
+
+    #[test]
+    fn test_hexadecimal_input_deserialization() {
+        let config = load_test_config(r#"
+            usb_device = "dead:BEEF"
+            monitor_input = "0x10"
+        "#).unwrap();
+        assert_eq!(config.monitor_input.value(), 16);
     }
 }
