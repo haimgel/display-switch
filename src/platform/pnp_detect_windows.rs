@@ -15,9 +15,8 @@ use winapi::shared::ntdef::LPCWSTR;
 use winapi::shared::windef::{HBRUSH, HCURSOR, HICON, HWND};
 use winapi::um::libloaderapi::GetModuleHandleW;
 use winapi::um::winuser::{
-    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetWindowLongPtrW,
-    PostQuitMessage, RegisterClassW, SetWindowLongPtrW, TranslateMessage, GWLP_USERDATA, MSG,
-    WM_CREATE, WM_DESTROY, WM_DEVICECHANGE, WNDCLASSW,
+    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, GetWindowLongPtrW, PostQuitMessage, RegisterClassW,
+    SetWindowLongPtrW, TranslateMessage, GWLP_USERDATA, MSG, WM_CREATE, WM_DESTROY, WM_DEVICECHANGE, WNDCLASSW,
 };
 
 /// Detection of plugged in / removed USB devices on Windows: listens for WM_DEVICECHANGE messages.
@@ -85,12 +84,7 @@ impl PnPDetectWindows {
     }
 
     /// Window procedure function to handle events
-    pub unsafe extern "system" fn window_proc(
-        hwnd: HWND,
-        msg: UINT,
-        wparam: WPARAM,
-        lparam: LPARAM,
-    ) -> LRESULT {
+    pub unsafe extern "system" fn window_proc(hwnd: HWND, msg: UINT, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
         match msg {
             WM_CREATE => {
                 let create_struct = lparam as *mut winapi::um::winuser::CREATESTRUCTW;

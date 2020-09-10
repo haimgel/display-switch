@@ -63,23 +63,16 @@ fn build_mac_ddc() {
         panic!("Swift library mac_ddc compilation failed")
     }
 
-    swift_target_info
-        .paths
-        .runtime_library_paths
-        .iter()
-        .for_each(|path| {
-            println!("cargo:rustc-link-search=native={}", path);
-        });
+    swift_target_info.paths.runtime_library_paths.iter().for_each(|path| {
+        println!("cargo:rustc-link-search=native={}", path);
+    });
     println!(
         "cargo:rustc-link-search=native=./mac_ddc/.build/{}/{}",
         swift_target_info.target.unversioned_triple, profile
     );
     println!("cargo:rustc-link-lib=static=mac_ddc");
     println!("cargo:rerun-if-changed=mac_ddc/src/*.swift");
-    println!(
-        "cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET={}",
-        MACOS_TARGET_VERSION
-    )
+    println!("cargo:rustc-env=MACOSX_DEPLOYMENT_TARGET={}", MACOS_TARGET_VERSION)
 }
 
 fn main() {

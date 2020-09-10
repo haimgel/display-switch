@@ -25,10 +25,7 @@ impl Configuration {
             .merge(config::File::from(config_file_name.to_path_buf()))?
             .merge(config::Environment::with_prefix("DISPLAY_SWITCH"))?;
         let config = settings.try_into::<Self>()?;
-        info!(
-            "Configuration loaded ({:?}): {:?}",
-            config_file_name, config
-        );
+        info!("Configuration loaded ({:?}): {:?}", config_file_name, config);
         Ok(config)
     }
 
@@ -84,9 +81,7 @@ mod tests {
 
     fn load_test_config(config_str: &str) -> Result<Configuration, ConfigError> {
         let mut settings = config::Config::default();
-        settings
-            .merge(config::File::from_str(config_str, Ini))
-            .unwrap();
+        settings.merge(config::File::from_str(config_str, Ini)).unwrap();
         settings.try_into::<Configuration>()
     }
 

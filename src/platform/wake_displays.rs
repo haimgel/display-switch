@@ -2,7 +2,7 @@
 // Copyright © 2020 Haim Gelfenbeyn
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 
 #[cfg(target_os = "windows")]
 /// Move a mouse a little bit, this causes the displays to wake up
@@ -20,11 +20,10 @@ pub fn wake_displays() -> Result<()> {
 
 #[cfg(target_os = "macos")]
 pub fn wake_displays() -> Result<()> {
+    use anyhow::anyhow;
     use std::process::Command;
-    match Command::new("/usr/bin/caffeinate")
-        .args(&["-u", "-t", "10"])
-        .status()
-    {
+
+    match Command::new("/usr/bin/caffeinate").args(&["-u", "-t", "10"]).status() {
         Ok(status) => {
             if status.success() {
                 Ok(())
@@ -35,10 +34,7 @@ pub fn wake_displays() -> Result<()> {
                 ))
             }
         }
-        Err(err) => Err(anyhow!(
-            "Couldn't wake displays, couldn't run 'caffeinate': {}",
-            err
-        )),
+        Err(err) => Err(anyhow!("Couldn't wake displays, couldn't run 'caffeinate': {}", err)),
     }
 }
 

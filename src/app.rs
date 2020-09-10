@@ -18,10 +18,7 @@ impl usb::UsbCallback for App {
     fn device_added(&self, device_id: &str) {
         debug!("Detected device change. Added device: {:?}", device_id);
         if device_id == self.config.usb_device {
-            info!(
-                "Detected device we're looking for {:?}",
-                &self.config.usb_device
-            );
+            info!("Detected device we're looking for {:?}", &self.config.usb_device);
             std::thread::spawn(|| {
                 wake_displays().map_err(|err| error!("{:?}", err));
             });

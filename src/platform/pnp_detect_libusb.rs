@@ -31,9 +31,7 @@ impl PnPDetectLibusb {
     pub fn detect(self) -> Result<()> {
         if rusb::has_hotplug() {
             let context = Context::new().unwrap();
-            context
-                .register_callback(None, None, None, Box::new(self))
-                .unwrap();
+            context.register_callback(None, None, None, Box::new(self)).unwrap();
             loop {
                 if let Err(err) = context.handle_events(None) {
                     error!("Error during USB errors handling: {:?}", err)

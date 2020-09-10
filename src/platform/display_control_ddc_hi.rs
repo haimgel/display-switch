@@ -37,18 +37,11 @@ impl DdcControlTrait for DdcControlDdcHi {
         let display_name = display_name(&display, display_idx);
         match display.handle.get_vcp_feature(INPUT_SELECT) {
             Ok(source) => {
-                info!(
-                    "Display {} is currently set to 0x{:x}",
-                    display_name,
-                    source.value()
-                );
+                info!("Display {} is currently set to 0x{:x}", display_name, source.value());
                 Ok(source.value())
             }
             Err(err) => {
-                error!(
-                    "Failed to get current input for display {}: {:?}",
-                    display_name, err
-                );
+                error!("Failed to get current input for display {}: {:?}", display_name, err);
                 Err(anyhow!(err))
             }
         }
@@ -64,10 +57,7 @@ impl DdcControlTrait for DdcControlDdcHi {
                 Ok(())
             }
             Err(err) => {
-                error!(
-                    "Failed to set display {} to 0x{:x} ({:?})",
-                    display_name, source, err
-                );
+                error!("Failed to set display {} to 0x{:x} ({:?})", display_name, source, err);
                 Err(anyhow!(err))
             }
         }
