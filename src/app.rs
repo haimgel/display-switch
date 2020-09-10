@@ -36,10 +36,15 @@ impl usb::UsbCallback for App {
 
 impl App {
     pub fn new() -> Self {
-        let app = Self {
-            config: Configuration::load().unwrap(),
-        };
         logging::init_logging().unwrap();
+        let config = match Configuration::load() {
+            Ok(config) => config,
+            Err(err) => {
+                error!("Could not load configuration: {:?}", err);
+                panic!("Configuration error")
+            }
+        };
+        let app = Self { config };
         return app;
     }
 
