@@ -2,6 +2,9 @@ name: build
 
 on: [push]
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
   build_mac:
     runs-on: macos-latest
