@@ -36,7 +36,7 @@ impl InputSource {
         } else {
             result = u16::from_str_radix(&str, 10);
         }
-        result.map_err({ |err| D::Error::custom(format!("{:?}", err)) })
+        result.map_err(|err| D::Error::custom(format!("{:?}", err)))
     }
 
     pub fn value(self) -> u16 {
