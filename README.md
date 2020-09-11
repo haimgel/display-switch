@@ -34,6 +34,23 @@ to switch to, when this device is connected. Supported values are `Hdmi1`, `Hdmi
 If your monitor has an USB-C port, it's usually reported as `DisplayPort2`. Input can also be specified as a "raw"
 decimal or hexadecimal value: `monitor_input = 0x10`
 
+### USB Device IDs
+To locate the ID of your USB device ID on Windows:
+1. Open Device Manager
+2. Locate the USB device, view the properties
+3. Switch to the *Details* tab and select *Hardware IDs* in the Property dropdown
+4. You should see a value similar to `HID\VID_046D&PID_C52B&MI_00` (the exact values will differ) - the USB device ID is a combination of the *Vendor ID* and the *Product ID* - for example, in this case it would be `046D:C52B`
+
+To locate the ID of your USB device ID on MacOS, open a terminal and run the following:
+```bash
+brew install lsusb
+
+$ lsusb > a
+$ lsusb > b
+$ opendiff a b
+```
+In the command output, the highlighted lines show you which USB IDs are most relevant.
+
 ## Logging
 
 * On MacOS: the log file is written to `/Users/USERNAME/Library/Logs/display-switch/display-switch.log`
