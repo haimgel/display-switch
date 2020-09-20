@@ -1,46 +1,50 @@
 name: build
 
-on: [push]
+on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_mac:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: cargo build --verbose --release
-      - uses: actions/upload-artifact@v1
-        with:
-          name: mac
-          path: target/release/display_switch
+  build:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
-  build_windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: cargo build --verbose --release
-      - name: Run tests
-        run: cargo test --verbose
-      - uses: actions/upload-artifact@v1
-        with:
-          name: windows
-          path: target/release/display_switch.exe
+    runs-on: ${{ matrix.os }}
 
-  build_linux:
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install build dependencies
+      - name: Install build dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install libudev-dev
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          # https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
       - name: Build
         run: cargo build --verbose --release
+
       - name: Run tests
         run: cargo test --verbose
-      - uses: actions/upload-artifact@v1
+
+      - name: Run executable
+        run: ./target/release/display_switch || true # todo: --version or --help when those exist
+
+      - uses: actions/upload-artifact@v2
         with:
-          name: linux
-          path: target/release/display_switch
+          name: ${{ runner.os }}
+          if-no-files-found: error
+          path: |
+            target/release/display_switch
+            target/release/display_switch.exe
