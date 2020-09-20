@@ -27,7 +27,8 @@ public func ddcWriteInputSelect(screenIdx: Int, input: UInt16) -> Bool {
 @_cdecl("ddcReadInputSelect")
 public func ddcReadInputSelect(screenIdx: Int) -> Int {
     guard let ddc = ddc(for: screenIdx) else { return -1 }
-    guard let (currentValue, _) = ddc.read(command: .inputSelect) else { return -1 }
+    guard let (currentValue, _) = ddc.read(command: .inputSelect, tries: 10, minReplyDelay: 3000 * UInt64(kNanosecondScale))
+            else { return -1 }
     return Int(currentValue)
 }
 
