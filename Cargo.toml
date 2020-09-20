@@ -22,12 +22,12 @@ simplelog = "^0.8"
 ddc = "^0.2"
 rusb = "^0.6"
 
-[target.'cfg(linux)'.dependencies]
+[target.'cfg(target_os = "linux")'.dependencies]
 ddc-hi = "^0.1"
 ddc-i2c = "^0.2"
 nvapi = "^0.1"
 
-[target.'cfg(windows)'.dependencies]
+[target.'cfg(target_os = "windows")'.dependencies]
 winapi = { version = "^0.3", features = ["winuser", "libloaderapi"] }
 ddc-hi = "^0.1"
 ddc-winapi = "^0.2"

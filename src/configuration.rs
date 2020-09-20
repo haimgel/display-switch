@@ -38,27 +38,29 @@ impl Configuration {
     }
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
-        #[cfg(target_os = "macos")]
-        let config_dir = dirs::preference_dir().ok_or(anyhow!("Config directory not found"))?;
-        #[cfg(target_os = "windows")]
-        let config_dir = dirs::config_dir()
-            .ok_or(anyhow!("Config directory not found"))?
-            .join("display-switch");
+        let config_dir = if cfg!(target_os = "macos") {
+            dirs::preference_dir().ok_or(anyhow!("Config directory not found"))?
+        } else {
+            dirs::config_dir()
+                .ok_or(anyhow!("Config directory not found"))?
+                .join("display-switch")
+        };
         std::fs::create_dir_all(&config_dir)?;
         Ok(config_dir.join("display-switch.ini"))
     }
 
     pub fn log_file_name() -> Result<std::path::PathBuf> {
-        #[cfg(target_os = "macos")]
-        let log_dir = dirs::home_dir()
-            .ok_or(anyhow!("Home directory not found"))?
-            .join("Library")
-            .join("Logs")
-            .join("display-switch");
-        #[cfg(target_os = "windows")]
-        let log_dir = dirs::data_local_dir()
-            .ok_or(anyhow!("Data-local directory not found"))?
-            .join("display-switch");
+        let log_dir = if cfg!(target_os = "macos") {
+            dirs::home_dir()
+                .ok_or(anyhow!("Home directory not found"))?
+                .join("Library")
+                .join("Logs")
+                .join("display-switch")
+        } else {
+            dirs::data_local_dir()
+                .ok_or(anyhow!("Data-local directory not found"))?
+                .join("display-switch")
+        };
         std::fs::create_dir_all(&log_dir)?;
         Ok(log_dir.join("display-switch.log"))
     }

@@ -2,6 +2,9 @@ name: build
 
 on: [push]
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
   build_mac:
     runs-on: macos-latest
@@ -26,3 +29,18 @@ jobs:
         with:
           name: windows
           path: target/release/display_switch.exe
+
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install build dependencies
+        run: sudo apt-get install libudev-dev
+      - name: Build
+        run: cargo build --verbose --release
+      - name: Run tests
+        run: cargo test --verbose
+      - uses: actions/upload-artifact@v1
+        with:
+          name: linux
+          path: target/release/display_switch
