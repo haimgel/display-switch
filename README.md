@@ -1,4 +1,4 @@
-![build](https://github.com/haimgel/display-switch/workflows/build/badge.svg)
+[![build](https://github.com/haimgel/display-switch/workflows/build/badge.svg?branch=master)](https://github.com/haimgel/display-switch/actions)
 [![GitHub license](https://img.shields.io/github/license/haimgel/display-switch)](https://github.com/haimgel/display-switch/blob/master/LICENSE)
 
 # Turn a $30 USB switch into a full-featured KVM
