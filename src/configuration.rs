@@ -5,14 +5,13 @@
 
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Deserializer};
-
-use crate::display_control;
+use crate::input_source::InputSource;
 
 #[derive(Debug, Deserialize)]
 pub struct Configuration {
     #[serde(deserialize_with = "Configuration::deserialize_usb_device")]
     pub usb_device: String,
-    pub monitor_input: display_control::InputSource,
+    pub monitor_input: InputSource,
 }
 
 impl Configuration {
@@ -69,8 +68,6 @@ mod tests {
     use super::*;
     use config::ConfigError;
     use config::FileFormat::Ini;
-    //use crate::display_control::{InputSource, SymbolicInputSource};
-    //use crate::display_control::InputSource::Symbolic;
 
     #[test]
     fn test_log_file_name() {

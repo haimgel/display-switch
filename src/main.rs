@@ -10,6 +10,7 @@ extern crate log;
 mod app;
 mod configuration;
 mod display_control;
+mod input_source;
 mod logging;
 mod platform;
 mod usb;
