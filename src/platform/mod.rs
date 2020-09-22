@@ -18,7 +18,5 @@ mod pnp_detect_windows;
 #[cfg(target_os = "windows")]
 pub use pnp_detect_windows::PnPDetectWindows as PnPDetect;
 
-mod display_control_ddc_hi;
-pub use display_control_ddc_hi::DdcControlDdcHi as DdcControl;
 mod wake_displays;
 pub use wake_displays::wake_displays;
