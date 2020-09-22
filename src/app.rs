@@ -41,8 +41,7 @@ impl App {
                 panic!("Configuration error")
             }
         };
-        let app = Self { config };
-        return app;
+        Self { config }
     }
 
     pub fn run(self) {

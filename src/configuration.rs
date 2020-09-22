@@ -4,8 +4,6 @@
 //
 
 use anyhow::{anyhow, Result};
-use config;
-use dirs;
 use serde::{Deserialize, Deserializer};
 
 use crate::display_control;
@@ -22,7 +20,7 @@ impl Configuration {
         let config_file_name = Self::config_file_name()?;
         let mut settings = config::Config::default();
         settings
-            .merge(config::File::from(config_file_name.to_path_buf()))?
+            .merge(config::File::from(config_file_name.clone()))?
             .merge(config::Environment::with_prefix("DISPLAY_SWITCH"))?;
         let config = settings.try_into::<Self>()?;
         info!("Configuration loaded ({:?}): {:?}", config_file_name, config);
@@ -39,10 +37,10 @@ impl Configuration {
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
         let config_dir = if cfg!(target_os = "macos") {
-            dirs::preference_dir().ok_or(anyhow!("Config directory not found"))?
+            dirs::preference_dir().ok_or_else(|| anyhow!("Config directory not found"))?
         } else {
             dirs::config_dir()
-                .ok_or(anyhow!("Config directory not found"))?
+                .ok_or_else(|| anyhow!("Config directory not found"))?
                 .join("display-switch")
         };
         std::fs::create_dir_all(&config_dir)?;
@@ -52,13 +50,13 @@ impl Configuration {
     pub fn log_file_name() -> Result<std::path::PathBuf> {
         let log_dir = if cfg!(target_os = "macos") {
             dirs::home_dir()
-                .ok_or(anyhow!("Home directory not found"))?
+                .ok_or_else(|| anyhow!("Home directory not found"))?
                 .join("Library")
                 .join("Logs")
                 .join("display-switch")
         } else {
             dirs::data_local_dir()
-                .ok_or(anyhow!("Data-local directory not found"))?
+                .ok_or_else(|| anyhow!("Data-local directory not found"))?
                 .join("display-switch")
         };
         std::fs::create_dir_all(&log_dir)?;
