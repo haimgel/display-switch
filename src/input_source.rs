@@ -7,12 +7,13 @@ use serde::de::Error;
 use serde::{Deserialize, Deserializer};
 use std::convert::TryFrom;
 use std::fmt;
+use paste::paste;
 
 macro_rules! symbolic_input_source {
     (
         $($name:ident: $value:expr)*
     ) => {
-        #[derive(Clone, Copy, Debug, Deserialize)]
+        #[derive(Clone, Copy, Debug)]
         pub enum SymbolicInputSource {
             $($name = $value,)*
         }
@@ -32,9 +33,11 @@ macro_rules! symbolic_input_source {
             type Error = ();
 
             fn try_from(v: &str) -> Result<Self, Self::Error> {
-                match v.to_lowercase().as_str() {
-                    $(stringify!(lower!($name)) => Ok(Self::$name),)*
-                    _ => Err(()),
+                paste! {
+                    match v.to_lowercase().as_str() {
+                        $(stringify!([< $name:lower >]) => Ok(Self::$name),)*
+                        _ => Err(()),
+                    }
                 }
             }
         }
