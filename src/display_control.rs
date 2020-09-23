@@ -3,8 +3,8 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
-use ddc_hi::{Ddc, Display};
 use crate::input_source::InputSource;
+use ddc_hi::{Ddc, Display};
 
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;

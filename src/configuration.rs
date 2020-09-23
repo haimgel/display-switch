@@ -3,9 +3,9 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use crate::input_source::InputSource;
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Deserializer};
-use crate::input_source::InputSource;
 
 #[derive(Debug, Deserialize)]
 pub struct Configuration {
