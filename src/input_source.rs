@@ -3,11 +3,11 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use paste::paste;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer};
 use std::convert::TryFrom;
 use std::fmt;
-use paste::paste;
 
 macro_rules! symbolic_input_source {
     (

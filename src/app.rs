@@ -18,16 +18,24 @@ impl usb::UsbCallback for App {
     fn device_added(&self, device_id: &str) {
         debug!("Detected device change. Added device: {:?}", device_id);
         if device_id == self.config.usb_device {
-            info!("Detected device we're looking for {:?}", &self.config.usb_device);
+            info!("Monitored device ({:?}) is connected", &self.config.usb_device);
             std::thread::spawn(|| {
                 wake_displays().map_err(|err| error!("{:?}", err));
             });
-            display_control::switch_to(self.config.monitor_input);
+            if let Some(input) = self.config.on_usb_connect {
+                display_control::switch_to(input);
+            }
         }
     }
 
     fn device_removed(&self, device_id: &str) {
         debug!("Detected device change. Removed device: {:?}", device_id);
+        if device_id == self.config.usb_device {
+            info!("Monitored device is ({:?}) is disconnected", &self.config.usb_device);
+            if let Some(input) = self.config.on_usb_disconnect {
+                display_control::switch_to(input);
+            }
+        }
     }
 }
 

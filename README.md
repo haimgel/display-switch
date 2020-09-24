@@ -26,13 +26,18 @@ Configuration file settings:
 
 ```ini
   usb_device = "1050:0407"
-  monitor_input = "Hdmi1"
+  on_usb_connect = "Hdmi1"
+  on_usb_disconnect = "Hdmi2"
 ```
 
-`usb_device` is which USB device to watch (vendor id / device id in hex), and `monitor_input` is which monitor input
-to switch to, when this device is connected. Supported values are `Hdmi1`, `Hdmi2`, `DisplayPort1`, `DisplayPort2`
+`usb_device` is which USB device to watch (vendor id / device id in hex), and `on_usb_connect` is which monitor input
+to switch to, when this device is connected. Supported values are `Hdmi1`, `Hdmi2`, `DisplayPort1`, `DisplayPort2`.
 If your monitor has an USB-C port, it's usually reported as `DisplayPort2`. Input can also be specified as a "raw"
-decimal or hexadecimal value: `monitor_input = 0x10`
+decimal or hexadecimal value: `on_usb_connect = 0x10`
+
+The optional `on_usb_disconnect` settings allows to switch in the other direction when the USB device is disconnected.
+Note that the preferred way is to have this app installed on both computers. Switching "away" is problematic: if the
+other computer has put the monitors to sleep, they will switch immediately back to the original input.
 
 ### USB Device IDs
 To locate the ID of your USB device ID on Windows:

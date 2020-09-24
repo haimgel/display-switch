@@ -11,7 +11,9 @@ use serde::{Deserialize, Deserializer};
 pub struct Configuration {
     #[serde(deserialize_with = "Configuration::deserialize_usb_device")]
     pub usb_device: String,
-    pub monitor_input: InputSource,
+    #[serde(alias = "monitor_input")]
+    pub on_usb_connect: Option<InputSource>,
+    pub on_usb_disconnect: Option<InputSource>,
 }
 
 impl Configuration {
@@ -99,11 +101,13 @@ mod tests {
         let config = load_test_config(
             r#"
             usb_device = "dead:BEEF"
-            monitor_input = "DisplayPort2"
+            on_usb_connect = "DisplayPort2"
+            on_usb_disconnect = DisplayPort1
         "#,
         )
         .unwrap();
-        assert_eq!(config.monitor_input.value(), 0x10);
+        assert_eq!(config.on_usb_connect.unwrap().value(), 0x10);
+        assert_eq!(config.on_usb_disconnect.unwrap().value(), 0x0f);
     }
 
     #[test]
@@ -112,10 +116,12 @@ mod tests {
             r#"
             usb_device = "dead:BEEF"
             monitor_input = 22
+            on_usb_disconnect = 33
         "#,
         )
         .unwrap();
-        assert_eq!(config.monitor_input.value(), 22);
+        assert_eq!(config.on_usb_connect.unwrap().value(), 22);
+        assert_eq!(config.on_usb_disconnect.unwrap().value(), 33);
     }
 
     #[test]
@@ -123,10 +129,12 @@ mod tests {
         let config = load_test_config(
             r#"
             usb_device = "dead:BEEF"
-            monitor_input = "0x10"
+            on_usb_connect = "0x10"
+            on_usb_disconnect = "0x20"
         "#,
         )
         .unwrap();
-        assert_eq!(config.monitor_input.value(), 16);
+        assert_eq!(config.on_usb_connect.unwrap().value(), 0x10);
+        assert_eq!(config.on_usb_disconnect.unwrap().value(), 0x20);
     }
 }
