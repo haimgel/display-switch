@@ -3,18 +3,17 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use crate::input_source::InputSource;
 use anyhow::{anyhow, Result};
-use config;
-use dirs;
 use serde::{Deserialize, Deserializer};
-
-use crate::display_control;
 
 #[derive(Debug, Deserialize)]
 pub struct Configuration {
     #[serde(deserialize_with = "Configuration::deserialize_usb_device")]
     pub usb_device: String,
-    pub monitor_input: display_control::InputSource,
+    #[serde(alias = "monitor_input")]
+    pub on_usb_connect: Option<InputSource>,
+    pub on_usb_disconnect: Option<InputSource>,
 }
 
 impl Configuration {
@@ -22,7 +21,7 @@ impl Configuration {
         let config_file_name = Self::config_file_name()?;
         let mut settings = config::Config::default();
         settings
-            .merge(config::File::from(config_file_name.to_path_buf()))?
+            .merge(config::File::from(config_file_name.clone()))?
             .merge(config::Environment::with_prefix("DISPLAY_SWITCH"))?;
         let config = settings.try_into::<Self>()?;
         info!("Configuration loaded ({:?}): {:?}", config_file_name, config);
@@ -39,10 +38,10 @@ impl Configuration {
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
         let config_dir = if cfg!(target_os = "macos") {
-            dirs::preference_dir().ok_or(anyhow!("Config directory not found"))?
+            dirs::preference_dir().ok_or_else(|| anyhow!("Config directory not found"))?
         } else {
             dirs::config_dir()
-                .ok_or(anyhow!("Config directory not found"))?
+                .ok_or_else(|| anyhow!("Config directory not found"))?
                 .join("display-switch")
         };
         std::fs::create_dir_all(&config_dir)?;
@@ -52,13 +51,13 @@ impl Configuration {
     pub fn log_file_name() -> Result<std::path::PathBuf> {
         let log_dir = if cfg!(target_os = "macos") {
             dirs::home_dir()
-                .ok_or(anyhow!("Home directory not found"))?
+                .ok_or_else(|| anyhow!("Home directory not found"))?
                 .join("Library")
                 .join("Logs")
                 .join("display-switch")
         } else {
             dirs::data_local_dir()
-                .ok_or(anyhow!("Data-local directory not found"))?
+                .ok_or_else(|| anyhow!("Data-local directory not found"))?
                 .join("display-switch")
         };
         std::fs::create_dir_all(&log_dir)?;
@@ -71,8 +70,6 @@ mod tests {
     use super::*;
     use config::ConfigError;
     use config::FileFormat::Ini;
-    //use crate::display_control::{InputSource, SymbolicInputSource};
-    //use crate::display_control::InputSource::Symbolic;
 
     #[test]
     fn test_log_file_name() {
@@ -104,11 +101,13 @@ mod tests {
         let config = load_test_config(
             r#"
             usb_device = "dead:BEEF"
-            monitor_input = "DisplayPort2"
+            on_usb_connect = "DisplayPort2"
+            on_usb_disconnect = DisplayPort1
         "#,
         )
         .unwrap();
-        assert_eq!(config.monitor_input.value(), 0x10);
+        assert_eq!(config.on_usb_connect.unwrap().value(), 0x10);
+        assert_eq!(config.on_usb_disconnect.unwrap().value(), 0x0f);
     }
 
     #[test]
@@ -117,10 +116,12 @@ mod tests {
             r#"
             usb_device = "dead:BEEF"
             monitor_input = 22
+            on_usb_disconnect = 33
         "#,
         )
         .unwrap();
-        assert_eq!(config.monitor_input.value(), 22);
+        assert_eq!(config.on_usb_connect.unwrap().value(), 22);
+        assert_eq!(config.on_usb_disconnect.unwrap().value(), 33);
     }
 
     #[test]
@@ -128,10 +129,12 @@ mod tests {
         let config = load_test_config(
             r#"
             usb_device = "dead:BEEF"
-            monitor_input = "0x10"
+            on_usb_connect = "0x10"
+            on_usb_disconnect = "0x20"
         "#,
         )
         .unwrap();
-        assert_eq!(config.monitor_input.value(), 16);
+        assert_eq!(config.on_usb_connect.unwrap().value(), 0x10);
+        assert_eq!(config.on_usb_disconnect.unwrap().value(), 0x20);
     }
 }

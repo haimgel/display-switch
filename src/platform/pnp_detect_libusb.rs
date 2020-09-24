@@ -15,11 +15,15 @@ pub struct PnPDetectLibusb {
 
 impl<T: UsbContext> rusb::Hotplug<T> for PnPDetectLibusb {
     fn device_arrived(&mut self, device: Device<T>) {
-        device2str(device).map(|str| self.callback.device_added(&str));
+        if let Some(str) = device2str(device) {
+            self.callback.device_added(&str)
+        }
     }
 
     fn device_left(&mut self, device: Device<T>) {
-        device2str(device).map(|str| self.callback.device_removed(&str));
+        if let Some(str) = device2str(device) {
+            self.callback.device_removed(&str)
+        }
     }
 }
 
