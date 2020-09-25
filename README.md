@@ -20,7 +20,7 @@ Rust, with the exception of DDC support on MacOS, which is done via statically-l
 The configuration is pretty similar on all platforms:
 
 On MacOS: the configuration file is expected in `~/Library/Preferences/display-switch.ini`
-On Windows: the configuration file is expected in `/Users/USERNAME/AppData/Roaming/display-switch/display-switch.ini`
+On Windows: the configuration file is expected in `C:\Users\USERNAME\AppData\Roaming\display-switch\display-switch.ini`
 
 Configuration file settings:
 
@@ -59,7 +59,7 @@ In the command output, the highlighted lines show you which USB IDs are most rel
 ## Logging
 
 * On MacOS: the log file is written to `/Users/USERNAME/Library/Logs/display-switch/display-switch.log`
-* On WindowS: the log file is written to `/Users/USERNAME/AppData/Local/display-switch/display-switch.log`
+* On Windows: the log file is written to `C:\Users\USERNAME\AppData\Local\display-switch\display-switch.log`
 
 ## Building from source
 
