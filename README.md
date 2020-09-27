@@ -39,6 +39,27 @@ The optional `on_usb_disconnect` settings allows to switch in the other directio
 Note that the preferred way is to have this app installed on both computers. Switching "away" is problematic: if the
 other computer has put the monitors to sleep, they will switch immediately back to the original input.
 
+### Different inputs on different monitors
+`display-switch` supports per-monitor configuration: add one or more monitor-specific configuration sections to set
+monitor-specific inputs. For example:
+
+```ini
+on_usb_connect = "DisplayPort2"
+on_usb_disconnect = "Hdmi1"
+
+[monitor1]
+monitor_id = "len"
+on_usb_connect = "DisplayPort1"
+
+[monitor2]
+monitor_id = "dell"
+on_usb_connect = "hdmi2"
+```
+
+`monitor_id` specifies a case-insensitive substring to match against the monitor ID. For example, 'len' would match
+`LEN P27u-10 S/N 1144206897` monitor ID. If more than one section has a match, a first one will be used.
+`on_usb_connect` and `on_usb_disconnect`, if defined, take precedence over global defaults.
+
 ### USB Device IDs
 To locate the ID of your USB device ID on Windows:
 1. Open Device Manager

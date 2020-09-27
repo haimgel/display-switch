@@ -3,6 +3,7 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use crate::configuration::{Configuration, SwitchDirection};
 use crate::input_source::InputSource;
 use ddc_hi::{Ddc, Display};
 
@@ -14,7 +15,12 @@ fn display_name(display: &Display) -> String {
 }
 
 pub fn log_current_source() {
-    for mut display in Display::enumerate() {
+    let displays = Display::enumerate();
+    if displays.is_empty() {
+        error!("Did not detect any DDC-compatible displays!");
+        return;
+    }
+    for mut display in displays {
         let display_name = display_name(&display);
         match display.handle.get_vcp_feature(INPUT_SELECT) {
             Ok(raw_source) => {
@@ -28,17 +34,29 @@ pub fn log_current_source() {
     }
 }
 
-pub fn switch_to(source: InputSource) {
-    for mut display in Display::enumerate() {
+pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
+    let displays = Display::enumerate();
+    if displays.is_empty() {
+        error!("Did not detect any DDC-compatible displays!");
+        return;
+    }
+    for mut display in displays {
         let display_name = display_name(&display);
-        debug!("Setting display '{}' to {}", display_name, source);
-        match display.handle.set_vcp_feature(INPUT_SELECT, source.value()) {
-            Ok(_) => {
-                info!("Display {} set to {}", display_name, source);
+        if let Some(input) = config.configuration_for_monitor(&display_name).source(switch_direction) {
+            debug!("Setting display {} to {}", display_name, input);
+            match display.handle.set_vcp_feature(INPUT_SELECT, input.value()) {
+                Ok(_) => {
+                    info!("Display {} set to {}", display_name, input);
+                }
+                Err(err) => {
+                    error!("Failed to set display {} to {} ({:?})", display_name, input, err);
+                }
             }
-            Err(err) => {
-                error!("Failed to set display {} to {} ({:?})", display_name, source, err);
-            }
+        } else {
+            info!(
+                "Display {} is not configured to switch on USB {}",
+                display_name, switch_direction
+            );
         }
     }
 }

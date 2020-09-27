@@ -3,7 +3,7 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
-use crate::configuration::Configuration;
+use crate::configuration::{Configuration, SwitchDirection};
 use crate::display_control;
 use crate::logging;
 use crate::platform::{wake_displays, PnPDetect};
@@ -22,9 +22,7 @@ impl usb::UsbCallback for App {
             std::thread::spawn(|| {
                 wake_displays().map_err(|err| error!("{:?}", err));
             });
-            if let Some(input) = self.config.on_usb_connect {
-                display_control::switch_to(input);
-            }
+            display_control::switch(&self.config, SwitchDirection::Connect);
         }
     }
 
@@ -32,9 +30,7 @@ impl usb::UsbCallback for App {
         debug!("Detected device change. Removed device: {:?}", device_id);
         if device_id == self.config.usb_device {
             info!("Monitored device is ({:?}) is disconnected", &self.config.usb_device);
-            if let Some(input) = self.config.on_usb_disconnect {
-                display_control::switch_to(input);
-            }
+            display_control::switch(&self.config, SwitchDirection::Disconnect);
         }
     }
 }
