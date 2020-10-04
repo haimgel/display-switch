@@ -21,7 +21,7 @@ fn display_name(display: &Display, index: Option<usize>) -> String {
 
 fn are_display_names_unique(displays: &[Display]) -> bool {
     let mut hash = HashSet::new();
-    !displays.iter().all(|display| hash.insert(display_name(display, None)))
+    displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
 pub fn log_current_source() {
