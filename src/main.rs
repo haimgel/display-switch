@@ -7,6 +7,8 @@
 #[macro_use]
 extern crate log;
 
+use anyhow::Result;
+
 mod app;
 mod configuration;
 mod display_control;
@@ -15,7 +17,9 @@ mod logging;
 mod platform;
 mod usb;
 
-fn main() {
-    let app = app::App::new();
-    app.run();
+fn main() -> Result<()> {
+    let app = app::App::new()?;
+    app.run()?;
+
+    Ok(())
 }

@@ -3,6 +3,8 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use anyhow::Result;
+
 use crate::configuration::{Configuration, SwitchDirection};
 use crate::display_control;
 use crate::logging;
@@ -36,21 +38,18 @@ impl usb::UsbCallback for App {
 }
 
 impl App {
-    pub fn new() -> Self {
-        logging::init_logging().unwrap();
-        let config = match Configuration::load() {
-            Ok(config) => config,
-            Err(err) => {
-                error!("Could not load configuration: {:?}", err);
-                panic!("Configuration error")
-            }
-        };
-        Self { config }
+    pub fn new() -> Result<Self> {
+        logging::init_logging()?;
+        let config = Configuration::load()?;
+
+        Ok(Self { config })
     }
 
-    pub fn run(self) {
+    pub fn run(self) -> Result<()> {
         display_control::log_current_source();
         let pnp_detector = PnPDetect::new(Box::new(self));
-        pnp_detector.detect().unwrap();
+        pnp_detector.detect()?;
+
+        Ok(())
     }
 }
