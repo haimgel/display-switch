@@ -97,7 +97,7 @@ In the command output, the highlighted lines show you which USB IDs are most rel
 
 ### Windows
 
-Copy `display_switch.exe` from `target\release` (where it was built in the previous step) to 
+Copy `display-switch.exe` from `target\release` (where it was built in the previous step) to 
 `C:\Users\Username\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` (replace Username with your 
 Windows user name).
 
@@ -105,7 +105,7 @@ Windows user name).
 
 ```bash
   # Get your INI file in order! (see above)
-  cp target/release/display_switch /usr/local/bin
+  cp target/release/display-switch /usr/local/bin
   cp dev.haim.display-switch.daemon.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
 ```

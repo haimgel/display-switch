@@ -1,5 +1,5 @@
 [package]
-name = "display_switch"
+name = "display-switch"
 version = "0.3.0"
 authors = ["Haim Gelfenbeyn <haim@g8n.me>"]
 edition = "2018"

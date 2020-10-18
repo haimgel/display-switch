@@ -5,7 +5,7 @@
         <key>Label</key>
         <string>dev.haim.display-switch.daemon</string>
         <key>Program</key>
-        <string>/usr/local/bin/display_switch</string>
+        <string>/usr/local/bin/display-switch</string>
         <key>RunAtLoad</key>
         <true/>
     </dict>
