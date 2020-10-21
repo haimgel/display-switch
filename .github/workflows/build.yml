@@ -39,12 +39,12 @@ jobs:
         run: cargo test --verbose
 
       - name: Run executable
-        run: ./target/release/display_switch || true # todo: --version or --help when those exist
+        run: ./target/release/display-switch || true # todo: --version or --help when those exist
 
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}
           if-no-files-found: error
           path: |
-            target/release/display_switch
-            target/release/display_switch.exe
+            target/release/display-switch
+            target/release/display-switch.exe
