@@ -3,7 +3,7 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 use crate::configuration::{Configuration, SwitchDirection};
 use crate::display_control;
@@ -39,8 +39,8 @@ impl usb::UsbCallback for App {
 
 impl App {
     pub fn new() -> Result<Self> {
-        logging::init_logging()?;
-        let config = Configuration::load()?;
+        logging::init_logging().context("failed to initialize logging")?;
+        let config = Configuration::load().context("failed to load configuration")?;
 
         Ok(Self { config })
     }

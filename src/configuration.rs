@@ -4,7 +4,7 @@
 //
 
 use crate::input_source::InputSource;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Deserializer};
 use std::fmt;
 
@@ -102,7 +102,8 @@ impl Configuration {
                 .ok_or_else(|| anyhow!("Config directory not found"))?
                 .join("display-switch")
         };
-        std::fs::create_dir_all(&config_dir)?;
+        std::fs::create_dir_all(&config_dir)
+            .with_context(|| format!("failed to create directory: {:?}", config_dir))?;
         Ok(config_dir.join("display-switch.ini"))
     }
 
@@ -118,7 +119,7 @@ impl Configuration {
                 .ok_or_else(|| anyhow!("Data-local directory not found"))?
                 .join("display-switch")
         };
-        std::fs::create_dir_all(&log_dir)?;
+        std::fs::create_dir_all(&log_dir).with_context(|| format!("failed to create directory: {:?}", log_dir))?;
         Ok(log_dir.join("display-switch.log"))
     }
 
