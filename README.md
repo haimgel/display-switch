@@ -12,8 +12,8 @@ monitors "one way" and relies on itself running on the other computers to switch
  
 ## Platforms supported
 
-The app should function on MacOS and Windows. Linux support is planned in a future release. Most of the code is in
-Rust, with the exception of DDC support on MacOS, which is done via statically-linked Swift library.
+The app should function on MacOS, Windows, and Linux. Most of the code is in Rust, with the exception of DDC support
+on MacOS, which is done via statically-linked Swift library.
 
 ## Configuration
 
@@ -21,6 +21,7 @@ The configuration is pretty similar on all platforms:
 
 On MacOS: the configuration file is expected in `~/Library/Preferences/display-switch.ini`
 On Windows: the configuration file is expected in `C:\Users\USERNAME\AppData\Roaming\display-switch\display-switch.ini`
+On Linux: the configuration file is expected in `$XDG_CONFIG_HOME/display-switch/display-switch.ini` or `~/.config/display-switch/display-switch.ini`
 
 Configuration file settings:
 
