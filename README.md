@@ -73,6 +73,7 @@ To locate the ID of your USB device ID on MacOS, open a terminal and run the fol
 brew install lsusb
 
 $ lsusb > a
+<switch the usb dock here>
 $ lsusb > b
 $ opendiff a b
 ```
