@@ -7,6 +7,7 @@ use crate::configuration::{Configuration, SwitchDirection};
 use crate::input_source::InputSource;
 use ddc_hi::{Ddc, Display};
 use std::collections::HashSet;
+use std::{thread, time};
 
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
@@ -24,8 +25,19 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
     displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
+fn displays() -> Vec<Display> {
+    let mut displays = Display::enumerate();
+    if displays.is_empty() {
+        let retry_duration = time::Duration::from_millis(2000);
+        warn!("Did not detect any DDC-compatible displays. Retrying after {} second(s)...", retry_duration.as_secs());
+        thread::sleep(retry_duration);
+        displays = Display::enumerate();
+    }
+    return displays;
+}
+
 pub fn log_current_source() {
-    let displays = Display::enumerate();
+    let displays = displays();
     if displays.is_empty() {
         error!("Did not detect any DDC-compatible displays!");
         return;
@@ -46,7 +58,7 @@ pub fn log_current_source() {
 }
 
 pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
-    let displays = Display::enumerate();
+    let displays = displays();
     if displays.is_empty() {
         error!("Did not detect any DDC-compatible displays!");
         return;
