@@ -20,7 +20,7 @@ on MacOS, which is done via statically-linked Swift library.
 The configuration is pretty similar on all platforms:
 
 On MacOS: the configuration file is expected in `~/Library/Preferences/display-switch.ini`
-On Windows: the configuration file is expected in `C:\Users\USERNAME\AppData\Roaming\display-switch\display-switch.ini`
+On Windows: the configuration file is expected in `%APPDATA%\display-switch\display-switch.ini`
 On Linux: the configuration file is expected in `$XDG_CONFIG_HOME/display-switch/display-switch.ini` or `~/.config/display-switch/display-switch.ini`
 
 Configuration file settings:
@@ -82,7 +82,7 @@ In the command output, the highlighted lines show you which USB IDs are most rel
 ## Logging
 
 * On MacOS: the log file is written to `/Users/USERNAME/Library/Logs/display-switch/display-switch.log`
-* On Windows: the log file is written to `C:\Users\USERNAME\AppData\Local\display-switch\display-switch.log`
+* On Windows: the log file is written to `%LOCALAPPDATA%\display-switch\display-switch.log`
 
 ## Building from source
 
@@ -100,7 +100,7 @@ In the command output, the highlighted lines show you which USB IDs are most rel
 ### Windows
 
 Copy `display_switch.exe` from `target\release` (where it was built in the previous step) to 
-`C:\Users\Username\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup` (replace Username with your 
+`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup` (replace Username with your 
 Windows user name).
 
 ### MacOS
