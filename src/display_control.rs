@@ -7,9 +7,11 @@ use crate::configuration::{Configuration, SwitchDirection};
 use crate::input_source::InputSource;
 use ddc_hi::{Ddc, Display};
 use std::collections::HashSet;
+use std::{thread, time};
 
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
+const RETRY_DELAY_MS: u64 = 2000;
 
 fn display_name(display: &Display, index: Option<usize>) -> String {
     if let Some(index) = index {
@@ -24,8 +26,23 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
     displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
-pub fn log_current_source() {
+fn displays() -> Vec<Display> {
     let displays = Display::enumerate();
+    if !displays.is_empty() {
+        return displays
+    }
+
+    // Under some conditions, such as when using a KVM, it's possible for the USB connection/disconnection events to
+    // occur before the display(s) become available. We retry once after a bit of a delay in order to be more
+    // forgiving with regard to timing.
+    let delay_duration = time::Duration::from_millis(RETRY_DELAY_MS);
+    warn!("Did not detect any DDC-compatible displays. Retrying after {} second(s)...", delay_duration.as_secs());
+    thread::sleep(delay_duration);
+    return Display::enumerate();
+}
+
+pub fn log_current_source() {
+    let displays = displays();
     if displays.is_empty() {
         error!("Did not detect any DDC-compatible displays!");
         return;
@@ -46,7 +63,7 @@ pub fn log_current_source() {
 }
 
 pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
-    let displays = Display::enumerate();
+    let displays = displays();
     if displays.is_empty() {
         error!("Did not detect any DDC-compatible displays!");
         return;
