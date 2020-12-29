@@ -26,14 +26,18 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
 }
 
 fn displays() -> Vec<Display> {
-    let mut displays = Display::enumerate();
-    if displays.is_empty() {
-        let retry_duration = time::Duration::from_millis(2000);
-        warn!("Did not detect any DDC-compatible displays. Retrying after {} second(s)...", retry_duration.as_secs());
-        thread::sleep(retry_duration);
-        displays = Display::enumerate();
+    let displays = Display::enumerate();
+    if !displays.is_empty() {
+        return displays
     }
-    return displays;
+
+    // Under some conditions, such as when using a KVM, it's possible for the USB connection/disconnection events to
+    // occur before the display(s) become available. We retry once after a bit of a delay in order to be more
+    // forgiving with regard to timing.
+    let retry_duration = time::Duration::from_millis(2000);
+    warn!("Did not detect any DDC-compatible displays. Retrying after {} second(s)...", retry_duration.as_secs());
+    thread::sleep(retry_duration);
+    return Display::enumerate();
 }
 
 pub fn log_current_source() {
