@@ -11,6 +11,7 @@ use std::{thread, time};
 
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
+const RETRY_DELAY_MS: u64 = 2000;
 
 fn display_name(display: &Display, index: Option<usize>) -> String {
     if let Some(index) = index {
@@ -34,9 +35,9 @@ fn displays() -> Vec<Display> {
     // Under some conditions, such as when using a KVM, it's possible for the USB connection/disconnection events to
     // occur before the display(s) become available. We retry once after a bit of a delay in order to be more
     // forgiving with regard to timing.
-    let retry_duration = time::Duration::from_millis(2000);
-    warn!("Did not detect any DDC-compatible displays. Retrying after {} second(s)...", retry_duration.as_secs());
-    thread::sleep(retry_duration);
+    let delay_duration = time::Duration::from_millis(RETRY_DELAY_MS);
+    warn!("Did not detect any DDC-compatible displays. Retrying after {} second(s)...", delay_duration.as_secs());
+    thread::sleep(delay_duration);
     return Display::enumerate();
 }
 
