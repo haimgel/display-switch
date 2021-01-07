@@ -83,6 +83,8 @@ In the command output, the highlighted lines show you which USB IDs are most rel
 
 * On MacOS: the log file is written to `/Users/USERNAME/Library/Logs/display-switch/display-switch.log`
 * On Windows: the log file is written to `%LOCALAPPDATA%\display-switch\display-switch.log`
+* On Linux: The log file is written to `$XDG_DATA_HOME/display-switch/display-switch.log`
+ or `~/.local/share/display-switch/display-switch.log`
 
 ## Building from source
 
@@ -110,4 +112,31 @@ Windows user name).
   cp target/release/display_switch /usr/local/bin
   cp dev.haim.display-switch.daemon.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
+```
+### Linux
+
+i2c needs root access, so run as root. Create a systemd unit file
+ `/etc/systemd/system/display-switch.service` with contents
+
+```
+[Unit]
+Description=Display switch via USB switch
+
+[Service]
+ExecStart=/usr/local/bin/display-switch
+Type=simple
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Create the config file at `/root/.config/display-switch/display-switch.ini`.
+Then enable the service with
+
+```bash
+systemctl daemon-reload
+systemctl enable display-switch.service
+systemctl start display-switch.service
 ```
