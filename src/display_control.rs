@@ -11,7 +11,7 @@ use std::{thread, time};
 
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
-const RETRY_DELAY_MS: u64 = 2000;
+const RETRY_DELAY_MS: u64 = 3000;
 
 fn display_name(display: &Display, index: Option<usize>) -> String {
     if let Some(index) = index {
