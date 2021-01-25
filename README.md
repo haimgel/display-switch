@@ -114,7 +114,11 @@ Windows user name).
   launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
 ```
 ### Linux
+Copy built executable:
 
+```bash
+  cp target/release/display_switch /usr/local/bin
+```
 i2c needs root access, so run as root. Create a systemd unit file
  `/etc/systemd/system/display-switch.service` with contents
 
@@ -123,7 +127,7 @@ i2c needs root access, so run as root. Create a systemd unit file
 Description=Display switch via USB switch
 
 [Service]
-ExecStart=/usr/local/bin/display-switch
+ExecStart=/usr/local/bin/display_switch
 Type=simple
 Restart=always
 User=root
