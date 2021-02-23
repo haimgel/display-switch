@@ -14,11 +14,19 @@ const INPUT_SELECT: u8 = 0x60;
 const RETRY_DELAY_MS: u64 = 3000;
 
 fn display_name(display: &Display, index: Option<usize>) -> String {
-    if let Some(index) = index {
-        format!("'{} #{}'", display.info.id, index)
-    } else {
-        format!("'{}'", display.info.id)
+    let mut str = "'".to_string();
+    str += &display.info.id;
+    for field in &[&display.info.manufacturer_id,
+                   &display.info.model_name,
+                   &display.info.serial_number] {
+        if let Some(s) = &field {
+            str = str + " " + s;
+        }
     }
+    if let Some(index) = index {
+        str = format!("{} #{}", str, index);
+    }
+    str + "'"
 }
 
 fn are_display_names_unique(displays: &[Display]) -> bool {
