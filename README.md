@@ -62,12 +62,15 @@ on_usb_connect = "hdmi2"
 `on_usb_connect` and `on_usb_disconnect`, if defined, take precedence over global defaults.
 
 ### USB Device IDs
+
+#### Windows
 To locate the ID of your USB device ID on Windows:
 1. Open Device Manager
 2. Locate the USB device, view the properties
 3. Switch to the *Details* tab and select *Hardware IDs* in the Property dropdown
 4. You should see a value similar to `HID\VID_046D&PID_C52B&MI_00` (the exact values will differ) - the USB device ID is a combination of the *Vendor ID* and the *Product ID* - for example, in this case it would be `046D:C52B`
 
+#### MacOS
 To locate the ID of your USB device ID on MacOS, open a terminal and run the following:
 ```bash
 brew install lsusb
@@ -78,6 +81,18 @@ $ lsusb > b
 $ opendiff a b
 ```
 In the command output, the highlighted lines show you which USB IDs are most relevant.
+
+#### Linux
+To locate the ID of your USB device on Linux, first install `lsusb`, which your Linux
+distro should have a package for. (On Debian, Ubuntu and RedHat, the package name is `usbutils`.)
+Then, in a terminal, run the following:
+```
+$ lsusb > a
+<switch the usb dock here>
+$ lsusb > b
+$ diff -u a b
+```
+The diff output will show which USB IDs are most relevant.
 
 ## Logging
 
@@ -96,6 +111,10 @@ In the command output, the highlighted lines show you which USB IDs are most rel
 
 [Install Xcode](https://developer.apple.com/xcode/), [install Rust](https://www.rust-lang.org/tools/install), then do
 `cargo build --release` 
+
+### Linux
+
+[Install Rust](https://www.rust-lang.org/tools/install), then do `cargo build --release`
 
 ## Running on startup
 
