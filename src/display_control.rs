@@ -14,10 +14,25 @@ const INPUT_SELECT: u8 = 0x60;
 const RETRY_DELAY_MS: u64 = 3000;
 
 fn display_name(display: &Display, index: Option<usize>) -> String {
+    // Different OSes populate different fields of ddc-hi-rs info structure differently. Create
+    // a synthetic "display_name" that makes sense on each OS
+    #[cfg(target_os = "linux")]
+    let display_id =
+        vec![&display.info.manufacturer_id, &display.info.model_name, &display.info.serial_number]
+            .into_iter()
+            .flatten()
+            .map(|s| s.as_str() )
+            .collect::<Vec<&str>>()
+            .join(" ");
+    #[cfg(target_os = "macos")]
+    let display_id = &display.info.id;
+    #[cfg(target_os = "windows")]
+    let display_id = &display.info.id;
+
     if let Some(index) = index {
-        format!("'{} #{}'", display.info.id, index)
+        format!("'{} #{}'", display_id, index)
     } else {
-        format!("'{}'", display.info.id)
+        format!("'{}'", display_id)
     }
 }
 
