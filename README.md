@@ -138,8 +138,21 @@ Copy built executable:
 ```bash
   cp target/release/display_switch /usr/local/bin
 ```
-i2c needs root access, so run as root. Create a systemd unit file
- `/etc/systemd/system/display-switch.service` with contents
+Enable read/write access to i2c devices for users in `i2c` group. Run as root :
+
+```bash
+groupadd i2c
+echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c"' >> /etc/udev/rules.d/10-local_i2c_group.rules
+udevadm control --reload-rules && udevadm trigger
+```
+
+Then add your user to the i2c group :
+
+```
+sudo usermod -aG i2c $(whoami)
+```
+
+Create a systemd unit file in your user directory (`/home/$USER/.config/systemd/user/display-switch.service`) with contents
 
 ```
 [Unit]
@@ -148,18 +161,18 @@ Description=Display switch via USB switch
 [Service]
 ExecStart=/usr/local/bin/display_switch
 Type=simple
+StandardOutput=journal
 Restart=always
-User=root
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
 
-Create the config file at `/root/.config/display-switch/display-switch.ini`.
+Create the config file at `/home/$USER/.config/display-switch/display-switch.ini`.
 Then enable the service with
 
 ```bash
-systemctl daemon-reload
-systemctl enable display-switch.service
-systemctl start display-switch.service
+systemctl --user daemon-reload
+systemctl --user enable display-switch.service
+systemctl --user start display-switch.service
 ```
