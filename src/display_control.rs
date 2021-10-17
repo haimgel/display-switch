@@ -2,11 +2,14 @@
 // Copyright © 2020 Haim Gelfenbeyn
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
-
 use crate::configuration::{Configuration, SwitchDirection};
 use crate::input_source::InputSource;
+
+use anyhow::{Error, Result};
 use ddc_hi::{Ddc, Display};
+use shell_words;
 use std::collections::HashSet;
+use std::process::{Command, Stdio};
 use std::{thread, time};
 
 /// VCP feature code for input select
@@ -86,7 +89,9 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
     let unique_names = are_display_names_unique(&displays);
     for (index, mut display) in displays.into_iter().enumerate() {
         let display_name = display_name(&display, if unique_names { None } else { Some(index + 1) });
-        if let Some(input) = config.configuration_for_monitor(&display_name).source(switch_direction) {
+        let input_sources = config.configuration_for_monitor(&display_name);
+        debug!("Input sources found for display {}: {:?}", display_name, input_sources);
+        if let Some(input) = input_sources.source(switch_direction) {
             debug!("Setting display {} to {}", display_name, input);
             match display.handle.set_vcp_feature(INPUT_SELECT, input.value()) {
                 Ok(_) => {
@@ -102,5 +107,37 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
                 display_name, switch_direction
             );
         }
+        if let Some(execute_command) = input_sources.execute_command(switch_direction) {
+            run_command(execute_command)
+        }
     }
+    if let Some(execute_command) = config.default_input_sources.execute_command(switch_direction) {
+        run_command(execute_command)
+    }
+}
+
+fn run_command(execute_command: &str) {
+    fn try_run_command(execute_command: &str) -> Result<()> {
+        let mut arguments = shell_words::split(execute_command)?;
+        if arguments.is_empty() { return Ok(()) }
+
+        let executable = arguments.remove(0);
+        let result = Command::new(executable)
+            .args(arguments)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()?
+            .wait()?;
+        return if result.success() {
+            info!("External command '{}' executed successfully", execute_command);
+            Ok(())
+        } else {
+            Err(Error::msg(format!("Exited with status {}", result)))
+        }
+    }
+
+    try_run_command(execute_command).unwrap_or_else( |err|
+        error!("Error executing external command '{}': {}", execute_command, err)
+    )
 }
