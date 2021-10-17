@@ -154,14 +154,15 @@ impl Configuration {
                 .and_then(|config| if config.matches(monitor_id) { Some(config) } else { None })
         });
         // Merge global config as needed
-        per_monitor_config.map_or(InputSources {
-            on_usb_connect: self.default_input_sources.on_usb_connect,
-            on_usb_disconnect: self.default_input_sources.on_usb_disconnect,
-            on_usb_connect_execute: None,
-            on_usb_disconnect_execute: None
-        }, |config| {
-            config.input_sources.merge(&self.default_input_sources)
-        })
+        per_monitor_config.map_or(
+            InputSources {
+                on_usb_connect: self.default_input_sources.on_usb_connect,
+                on_usb_disconnect: self.default_input_sources.on_usb_disconnect,
+                on_usb_connect_execute: None,
+                on_usb_disconnect_execute: None,
+            },
+            |config| config.input_sources.merge(&self.default_input_sources),
+        )
     }
 }
 

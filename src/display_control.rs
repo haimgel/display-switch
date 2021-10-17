@@ -20,13 +20,16 @@ fn display_name(display: &Display, index: Option<usize>) -> String {
     // Different OSes populate different fields of ddc-hi-rs info structure differently. Create
     // a synthetic "display_name" that makes sense on each OS
     #[cfg(target_os = "linux")]
-    let display_id =
-        vec![&display.info.manufacturer_id, &display.info.model_name, &display.info.serial_number]
-            .into_iter()
-            .flatten()
-            .map(|s| s.as_str() )
-            .collect::<Vec<&str>>()
-            .join(" ");
+    let display_id = vec![
+        &display.info.manufacturer_id,
+        &display.info.model_name,
+        &display.info.serial_number,
+    ]
+    .into_iter()
+    .flatten()
+    .map(|s| s.as_str())
+    .collect::<Vec<&str>>()
+    .join(" ");
     #[cfg(target_os = "macos")]
     let display_id = &display.info.id;
     #[cfg(target_os = "windows")]
@@ -47,14 +50,17 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
 fn displays() -> Vec<Display> {
     let displays = Display::enumerate();
     if !displays.is_empty() {
-        return displays
+        return displays;
     }
 
     // Under some conditions, such as when using a KVM, it's possible for the USB connection/disconnection events to
     // occur before the display(s) become available. We retry once after a bit of a delay in order to be more
     // forgiving with regard to timing.
     let delay_duration = time::Duration::from_millis(RETRY_DELAY_MS);
-    warn!("Did not detect any DDC-compatible displays. Retrying after {} second(s)...", delay_duration.as_secs());
+    warn!(
+        "Did not detect any DDC-compatible displays. Retrying after {} second(s)...",
+        delay_duration.as_secs()
+    );
     thread::sleep(delay_duration);
     return Display::enumerate();
 }
@@ -119,7 +125,9 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
 fn run_command(execute_command: &str) {
     fn try_run_command(execute_command: &str) -> Result<()> {
         let mut arguments = shell_words::split(execute_command)?;
-        if arguments.is_empty() { return Ok(()) }
+        if arguments.is_empty() {
+            return Ok(());
+        }
 
         let executable = arguments.remove(0);
         let result = Command::new(executable)
@@ -134,10 +142,9 @@ fn run_command(execute_command: &str) {
             Ok(())
         } else {
             Err(Error::msg(format!("Exited with status {}", result)))
-        }
+        };
     }
 
-    try_run_command(execute_command).unwrap_or_else( |err|
-        error!("Error executing external command '{}': {}", execute_command, err)
-    )
+    try_run_command(execute_command)
+        .unwrap_or_else(|err| error!("Error executing external command '{}': {}", execute_command, err))
 }
