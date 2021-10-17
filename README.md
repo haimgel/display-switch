@@ -61,6 +61,27 @@ on_usb_connect = "hdmi2"
 `LEN P27u-10 S/N 1144206897` monitor ID. If more than one section has a match, a first one will be used.
 `on_usb_connect` and `on_usb_disconnect`, if defined, take precedence over global defaults.
 
+### Running external commands
+`display-switch` supports running external commands upon connection or disconnection of USB devices. This configuration
+can be global (runs every time a configured USB device is connected or disconnected) or per-monitor (runs only when
+a given monitor is being switched):
+
+```ini
+usb_device = "1050:0407"
+on_usb_connect = "Hdmi1"
+on_usb_disconnect = "DisplayPort2"
+on_usb_connect_execute = "echo connected"
+on_usb_disconnect_execute = "echo disconnected"
+
+[monitor1]
+monitor_id="foobar"
+on_usb_connect_execute = "echo usb connected, monitor 'foobar' being switched"
+on_usb_disconnect_execute = "echo usb disconnected, monitor 'foobar' being switched"
+```
+
+Note: external applications are executed as the same user that started `display-switch`. This program supports splitting
+supplied configuration into application name and parameters, but no other shell features are supported.
+
 ### USB Device IDs
 
 #### Windows

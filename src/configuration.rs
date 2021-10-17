@@ -14,12 +14,14 @@ pub enum SwitchDirection {
     Disconnect,
 }
 
-#[derive(Debug, Deserialize, Copy, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct InputSources {
     // Note: Serde alias won't work here, because of https://github.com/serde-rs/serde/issues/1504
     // So cannot alias "on_usb_connect" to "monitor_input"
     pub on_usb_connect: Option<InputSource>,
     pub on_usb_disconnect: Option<InputSource>,
+    pub on_usb_connect_execute: Option<String>,
+    pub on_usb_disconnect_execute: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -34,7 +36,7 @@ pub struct Configuration {
     #[serde(deserialize_with = "Configuration::deserialize_usb_device")]
     pub usb_device: String,
     #[serde(flatten)]
-    input_sources: InputSources,
+    pub default_input_sources: InputSources,
     monitor1: Option<PerMonitorConfiguration>,
     monitor2: Option<PerMonitorConfiguration>,
     monitor3: Option<PerMonitorConfiguration>,
@@ -63,6 +65,11 @@ impl InputSources {
         Self {
             on_usb_connect: self.on_usb_connect.or(default.on_usb_connect),
             on_usb_disconnect: self.on_usb_disconnect.or(default.on_usb_disconnect),
+            // Global configuration for execution is not merged! Otherwise, for two
+            // monitors, we'll be executing the same command twice. Global config is treated
+            // separately during switching.
+            on_usb_connect_execute: self.on_usb_connect_execute.clone(),
+            on_usb_disconnect_execute: self.on_usb_disconnect_execute.clone(),
         }
     }
 
@@ -70,6 +77,13 @@ impl InputSources {
         match direction {
             SwitchDirection::Connect => self.on_usb_connect,
             SwitchDirection::Disconnect => self.on_usb_disconnect,
+        }
+    }
+
+    pub fn execute_command(&self, direction: SwitchDirection) -> Option<&str> {
+        match direction {
+            SwitchDirection::Connect => self.on_usb_connect_execute.as_ref().map(|x| &**x),
+            SwitchDirection::Disconnect => self.on_usb_disconnect_execute.as_ref().map(|x| &**x),
         }
     }
 }
@@ -140,8 +154,13 @@ impl Configuration {
                 .and_then(|config| if config.matches(monitor_id) { Some(config) } else { None })
         });
         // Merge global config as needed
-        per_monitor_config.map_or(self.input_sources, |config| {
-            config.input_sources.merge(&self.input_sources)
+        per_monitor_config.map_or(InputSources {
+            on_usb_connect: self.default_input_sources.on_usb_connect,
+            on_usb_disconnect: self.default_input_sources.on_usb_disconnect,
+            on_usb_connect_execute: None,
+            on_usb_disconnect_execute: None
+        }, |config| {
+            config.input_sources.merge(&self.default_input_sources)
         })
     }
 }
@@ -187,8 +206,8 @@ mod tests {
         "#,
         )
         .unwrap();
-        assert_eq!(config.input_sources.on_usb_connect.unwrap().value(), 0x10);
-        assert_eq!(config.input_sources.on_usb_disconnect.unwrap().value(), 0x0f);
+        assert_eq!(config.default_input_sources.on_usb_connect.unwrap().value(), 0x10);
+        assert_eq!(config.default_input_sources.on_usb_disconnect.unwrap().value(), 0x0f);
     }
 
     #[test]
@@ -201,8 +220,8 @@ mod tests {
         "#,
         )
         .unwrap();
-        assert_eq!(config.input_sources.on_usb_connect.unwrap().value(), 22);
-        assert_eq!(config.input_sources.on_usb_disconnect.unwrap().value(), 33);
+        assert_eq!(config.default_input_sources.on_usb_connect.unwrap().value(), 22);
+        assert_eq!(config.default_input_sources.on_usb_disconnect.unwrap().value(), 33);
     }
 
     #[test]
@@ -215,8 +234,8 @@ mod tests {
         "#,
         )
         .unwrap();
-        assert_eq!(config.input_sources.on_usb_connect.unwrap().value(), 0x10);
-        assert_eq!(config.input_sources.on_usb_disconnect.unwrap().value(), 0x20);
+        assert_eq!(config.default_input_sources.on_usb_connect.unwrap().value(), 0x10);
+        assert_eq!(config.default_input_sources.on_usb_disconnect.unwrap().value(), 0x20);
     }
 
     #[test]
@@ -226,10 +245,12 @@ mod tests {
             usb_device = "dead:BEEF"
             on_usb_connect = "0x10"
             on_usb_disconnect = "0x20"
+            on_usb_connect_execute = "foo"
 
             [monitor1]
             monitor_id = 123
             on_usb_connect = 0x11
+            on_usb_disconnect_execute = "bar"
 
             [monitor2]
             monitor_id = 45
@@ -269,6 +290,12 @@ mod tests {
                 .unwrap()
                 .value(),
             0x13
+        );
+        // Optional "run command" on connect / disconnect
+        assert_eq!(config.configuration_for_monitor("123").on_usb_connect_execute, None);
+        assert_eq!(
+            config.configuration_for_monitor("123").on_usb_disconnect_execute,
+            Some("bar".into())
         );
     }
 }

@@ -22,6 +22,7 @@ log = "^0.4"
 simplelog = "^0.8"
 ddc = "^0.2"
 rusb = "^0.6"
+shell-words = "^1"
 ddc-hi = { "git" = "https://github.com/haimgel/ddc-hi-rs.git", branch = "feature/macos-support" }
 
 [target.'cfg(target_os = "macos")'.dependencies]
