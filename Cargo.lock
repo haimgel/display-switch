@@ -305,7 +305,7 @@ dependencies = [
 
 [[package]]
 name = "display_switch"
-version = "0.3.0"
+version = "1.1.0"
 dependencies = [
  "anyhow",
  "config",
