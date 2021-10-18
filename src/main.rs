@@ -8,6 +8,8 @@
 extern crate log;
 
 use anyhow::Result;
+
+#[cfg(target_os = "windows")]
 use winapi::um::wincon::{AttachConsole, ATTACH_PARENT_PROCESS};
 
 mod app;
@@ -21,10 +23,9 @@ mod usb;
 /// On Windows, re-attach the console, if parent process has the console. This allows
 /// to see the log output when run from the command line.
 fn attach_console() {
-    if cfg!(windows) {
-        unsafe {
-            AttachConsole(ATTACH_PARENT_PROCESS);
-        }
+    #[cfg(target_os = "windows")]
+    unsafe {
+        AttachConsole(ATTACH_PARENT_PROCESS);
     }
 }
 
