@@ -76,11 +76,14 @@ on_usb_disconnect_execute = "echo disconnected"
 [monitor1]
 monitor_id="foobar"
 on_usb_connect_execute = "echo usb connected, monitor 'foobar' being switched"
-on_usb_disconnect_execute = "echo usb disconnected, monitor 'foobar' being switched"
+on_usb_disconnect_execute = "'c:\\program files\\my app.exe' --parameter"
 ```
 
-Note: external applications are executed as the same user that started `display-switch`. This program supports splitting
-supplied configuration into application name and parameters, but no other shell features are supported.
+Notes: 
+1. External applications are executed as the same user that started `display-switch`. 
+2. This program supports splitting supplied configuration into application name and parameters, but no other shell features are supported.
+3. If the application path contains spaces, surround the full file path with single quotes.
+4. On Windows, escape the backslashes (replace \ with \\, see the example above).
 
 ### USB Device IDs
 
