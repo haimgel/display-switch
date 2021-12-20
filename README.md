@@ -160,7 +160,7 @@ Windows user name).
 Copy built executable:
 
 ```bash
-  cp target/release/display_switch /usr/local/bin
+  cp target/release/display_switch /usr/local/bin/
 ```
 Enable read/write access to i2c devices for users in `i2c` group. Run as root :
 
