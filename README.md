@@ -152,7 +152,7 @@ Windows user name).
 
 ```bash
   # Get your INI file in order! (see above)
-  cp target/release/display_switch /usr/local/bin
+  cp target/release/display_switch /usr/local/bin/
   cp dev.haim.display-switch.daemon.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
 ```
