@@ -152,7 +152,7 @@ Windows user name).
 
 ```bash
   # Get your INI file in order! (see above)
-  cp target/release/display_switch /usr/local/bin
+  cp target/release/display_switch /usr/local/bin/
   cp dev.haim.display-switch.daemon.plist ~/Library/LaunchAgents/
   launchctl load ~/Library/LaunchAgents/dev.haim.display-switch.daemon.plist
 ```
@@ -160,7 +160,7 @@ Windows user name).
 Copy built executable:
 
 ```bash
-  cp target/release/display_switch /usr/local/bin
+  cp target/release/display_switch /usr/local/bin/
 ```
 Enable read/write access to i2c devices for users in `i2c` group. Run as root :
 
