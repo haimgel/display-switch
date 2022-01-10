@@ -12,8 +12,10 @@ monitors "one way" and relies on itself running on the other computers to switch
  
 ## Platforms supported
 
-The app should function on MacOS, Windows, and Linux. Most of the code is in Rust, with the exception of DDC support
-on MacOS, which is done via statically-linked Swift library.
+The app should function on MacOS (Intel Macs only), Windows, and Linux.
+
+**NOTE:** Display Switch is currently **not** working on M1 Macs: M1 series SoC support in `ddc-macos-rs` is planned but is not 
+[implemented yet](https://github.com/haimgel/ddc-macos-rs/issues/2).
 
 ## Configuration
 
