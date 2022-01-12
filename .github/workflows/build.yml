@@ -41,7 +41,7 @@ jobs:
         run: cargo test
 
       - name: Run executable
-        run: ./target/release/display_switch || true # todo: --version or --help when those exist
+        run: ./target/release/display_switch --version
 
       - uses: actions/upload-artifact@v2
         with:

@@ -8,6 +8,7 @@
 extern crate log;
 
 use anyhow::Result;
+use std::env;
 
 #[cfg(target_os = "windows")]
 use winapi::um::wincon::{AttachConsole, ATTACH_PARENT_PROCESS};
@@ -30,6 +31,11 @@ fn attach_console() {
 }
 
 fn main() -> Result<()> {
+    let args: Vec<String> = env::args().collect();
+    if args.len() == 2 && args[1] == "--version" {
+        println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+        return Ok(());
+    }
     attach_console();
     let app = app::App::new()?;
     app.run()?;
