@@ -31,12 +31,14 @@ fn attach_console() {
 }
 
 fn main() -> Result<()> {
+    attach_console();
+
     let args: Vec<String> = env::args().collect();
     if args.len() == 2 && args[1] == "--version" {
         println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
-    attach_console();
+
     let app = app::App::new()?;
     app.run()?;
     Ok(())
