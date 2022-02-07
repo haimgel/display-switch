@@ -147,8 +147,7 @@ The diff output will show which USB IDs are most relevant.
 ### Windows
 
 Copy `display_switch.exe` from `target\release` (where it was built in the previous step) to 
-`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup` (replace Username with your 
-Windows user name).
+`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`.
 
 ### MacOS
 
