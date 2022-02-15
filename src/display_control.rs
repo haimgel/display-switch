@@ -47,6 +47,30 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
     displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
+fn try_switch_display(mut display: Display, display_name: String, input: InputSource) {
+	match display.handle.get_vcp_feature(INPUT_SELECT) {
+		Ok(raw_source) => {
+			let current_source = InputSource::from(raw_source.value());
+			if current_source.value() == input.value() {
+				info!("Display {} is already set to {}", display_name, current_source);
+				return;
+			}
+		}
+		Err(err) => {
+			warn!("Failed to get current input for display {}: {:?}", display_name, err);
+		}
+	}
+	debug!("Setting display {} to {}", display_name, input);
+	match display.handle.set_vcp_feature(INPUT_SELECT, input.value()) {
+		Ok(_) => {
+			info!("Display {} set to {}", display_name, input);
+		}
+		Err(err) => {
+			error!("Failed to set display {} to {} ({:?})", display_name, input, err);
+		}
+	}
+}
+
 fn displays() -> Vec<Display> {
     let displays = Display::enumerate();
     if !displays.is_empty() {
@@ -93,20 +117,12 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
         return;
     }
     let unique_names = are_display_names_unique(&displays);
-    for (index, mut display) in displays.into_iter().enumerate() {
+    for (index, display) in displays.into_iter().enumerate() {
         let display_name = display_name(&display, if unique_names { None } else { Some(index + 1) });
         let input_sources = config.configuration_for_monitor(&display_name);
         debug!("Input sources found for display {}: {:?}", display_name, input_sources);
         if let Some(input) = input_sources.source(switch_direction) {
-            debug!("Setting display {} to {}", display_name, input);
-            match display.handle.set_vcp_feature(INPUT_SELECT, input.value()) {
-                Ok(_) => {
-                    info!("Display {} set to {}", display_name, input);
-                }
-                Err(err) => {
-                    error!("Failed to set display {} to {} ({:?})", display_name, input, err);
-                }
-            }
+			try_switch_display(display, display_name, input);
         } else {
             info!(
                 "Display {} is not configured to switch on USB {}",
