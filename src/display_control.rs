@@ -6,7 +6,7 @@ use crate::configuration::{Configuration, SwitchDirection};
 use crate::input_source::InputSource;
 
 use anyhow::{Error, Result};
-use ddc_hi::{Ddc, Display};
+use ddc_hi::{Ddc, Display, Handle};
 use shell_words;
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
@@ -47,12 +47,11 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
     displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
-fn try_switch_display(mut display: Display, display_name: String, input: InputSource) {
-	match display.handle.get_vcp_feature(INPUT_SELECT) {
+fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource) {
+	match handle.get_vcp_feature(INPUT_SELECT) {
 		Ok(raw_source) => {
-			let current_source = InputSource::from(raw_source.value());
-			if current_source.value() == input.value() {
-				info!("Display {} is already set to {}", display_name, current_source);
+			if raw_source.value() == input.value() {
+				info!("Display {} is already set to {}", display_name, input);
 				return;
 			}
 		}
@@ -61,7 +60,7 @@ fn try_switch_display(mut display: Display, display_name: String, input: InputSo
 		}
 	}
 	debug!("Setting display {} to {}", display_name, input);
-	match display.handle.set_vcp_feature(INPUT_SELECT, input.value()) {
+	match handle.set_vcp_feature(INPUT_SELECT, input.value()) {
 		Ok(_) => {
 			info!("Display {} set to {}", display_name, input);
 		}
@@ -117,12 +116,12 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
         return;
     }
     let unique_names = are_display_names_unique(&displays);
-    for (index, display) in displays.into_iter().enumerate() {
+    for (index, mut display) in displays.into_iter().enumerate() {
         let display_name = display_name(&display, if unique_names { None } else { Some(index + 1) });
         let input_sources = config.configuration_for_monitor(&display_name);
         debug!("Input sources found for display {}: {:?}", display_name, input_sources);
         if let Some(input) = input_sources.source(switch_direction) {
-			try_switch_display(display, display_name, input);
+			try_switch_display(&mut display.handle, &display_name, input);
         } else {
             info!(
                 "Display {} is not configured to switch on USB {}",
