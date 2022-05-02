@@ -24,6 +24,7 @@ ddc = "^0.2"
 rusb = "^0.6"
 shell-words = "^1"
 ddc-hi = "0.3.0"
+uinput = "0.1.3"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 ddc-macos = "^0.2"
