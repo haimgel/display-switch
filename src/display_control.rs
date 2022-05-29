@@ -6,7 +6,7 @@ use crate::configuration::{Configuration, SwitchDirection};
 use crate::input_source::InputSource;
 
 use anyhow::{Error, Result};
-use ddc_hi::{Ddc, Display};
+use ddc_hi::{Ddc, Display, Handle};
 use shell_words;
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
@@ -45,6 +45,29 @@ fn display_name(display: &Display, index: Option<usize>) -> String {
 fn are_display_names_unique(displays: &[Display]) -> bool {
     let mut hash = HashSet::new();
     displays.iter().all(|display| hash.insert(display_name(display, None)))
+}
+
+fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource) {
+	match handle.get_vcp_feature(INPUT_SELECT) {
+		Ok(raw_source) => {
+			if raw_source.value() & 0xff == input.value() {
+				info!("Display {} is already set to {}", display_name, input);
+				return;
+			}
+		}
+		Err(err) => {
+			warn!("Failed to get current input for display {}: {:?}", display_name, err);
+		}
+	}
+	debug!("Setting display {} to {}", display_name, input);
+	match handle.set_vcp_feature(INPUT_SELECT, input.value()) {
+		Ok(_) => {
+			info!("Display {} set to {}", display_name, input);
+		}
+		Err(err) => {
+			error!("Failed to set display {} to {} ({:?})", display_name, input, err);
+		}
+	}
 }
 
 fn displays() -> Vec<Display> {
@@ -98,15 +121,7 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
         let input_sources = config.configuration_for_monitor(&display_name);
         debug!("Input sources found for display {}: {:?}", display_name, input_sources);
         if let Some(input) = input_sources.source(switch_direction) {
-            debug!("Setting display {} to {}", display_name, input);
-            match display.handle.set_vcp_feature(INPUT_SELECT, input.value()) {
-                Ok(_) => {
-                    info!("Display {} set to {}", display_name, input);
-                }
-                Err(err) => {
-                    error!("Failed to set display {} to {} ({:?})", display_name, input, err);
-                }
-            }
+			try_switch_display(&mut display.handle, &display_name, input);
         } else {
             info!(
                 "Display {} is not configured to switch on USB {}",
