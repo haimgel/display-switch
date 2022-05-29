@@ -50,7 +50,7 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
 fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource) {
 	match handle.get_vcp_feature(INPUT_SELECT) {
 		Ok(raw_source) => {
-			if raw_source.value() == input.value() {
+			if raw_source.value() & 0xff == input.value() {
 				info!("Display {} is already set to {}", display_name, input);
 				return;
 			}
