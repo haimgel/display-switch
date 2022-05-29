@@ -13,17 +13,17 @@ serde = { version = "^1.0", features = ["derive"] }
 serde_json = "^1.0"
 
 [dependencies]
-config = "^0.10"
+config = "^0.11"
 paste = "^1"
 dirs = "^3.0"
 serde = { version = "^1.0", features = ["derive"] }
 anyhow = "^1.0"
 log = "^0.4"
-simplelog = "^0.8"
+simplelog = "^0.12"
 ddc = "^0.2"
-rusb = "^0.6"
+rusb = "^0.7"
 shell-words = "^1"
-ddc-hi = "0.3.0"
+ddc-hi = "0.4.1"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 ddc-macos = "^0.2"
