@@ -204,7 +204,7 @@ dependencies = [
 
 [[package]]
 name = "display_switch"
-version = "1.2.0"
+version = "1.1.0"
 dependencies = [
  "anyhow",
  "config",
@@ -352,9 +352,9 @@ dependencies = [
 
 [[package]]
 name = "libusb1-sys"
-version = "0.5.0"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e22e89d08bbe6816c6c5d446203b859eba35b8fa94bf1b7edb2f6d25d43f023f"
+checksum = "6dfab089105aa85a3b492b421bd90d55e6257f00f8447cc3873c44f8206809ce"
 dependencies = [
  "cc",
  "libc",
@@ -593,9 +593,9 @@ dependencies = [
 
 [[package]]
 name = "rusb"
-version = "0.7.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c470dc7dc6e4710b6f85e9c4aa4650bc742260b39a36328180578db76fa258c1"
+checksum = "703aa035c21c589b34fb5136b12e68fc8dcf7ea46486861381361dd8ebf5cee0"
 dependencies = [
  "libc",
  "libusb1-sys",
