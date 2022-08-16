@@ -21,7 +21,7 @@ anyhow = "^1.0"
 log = "^0.4"
 simplelog = "^0.12"
 ddc = "^0.2"
-rusb = "^0.7"
+rusb = "^0.9.1"
 shell-words = "^1"
 ddc-hi = "0.4.1"
 
