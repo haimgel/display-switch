@@ -106,34 +106,35 @@ impl PnPDetectWindows {
 
     /// Create an invisible window to handle WM_DEVICECHANGE message
     fn create_window(&mut self) {
-            let winapi_class_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindowClass")
-                .encode_wide()
-                .chain(once(0))
-                .collect();
-            let hinstance = unsafe { GetModuleHandleW(std::ptr::null()) };
+        let winapi_class_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindowClass")
+            .encode_wide()
+            .chain(once(0))
+            .collect();
+        let hinstance = unsafe { GetModuleHandleW(std::ptr::null()) };
 
-            let wc = WNDCLASSW {
-                style: 0,
-                lpfnWndProc: Some(Self::window_proc),
-                cbClsExtra: 0,
-                cbWndExtra: 0,
-                hInstance: hinstance,
-                hIcon: 0 as HICON,
-                hCursor: 0 as HCURSOR,
-                hbrBackground: 0 as HBRUSH,
-                lpszMenuName: 0 as LPCWSTR,
-                lpszClassName: winapi_class_name.as_ptr(),
-            };
+        let wc = WNDCLASSW {
+            style: 0,
+            lpfnWndProc: Some(Self::window_proc),
+            cbClsExtra: 0,
+            cbWndExtra: 0,
+            hInstance: hinstance,
+            hIcon: 0 as HICON,
+            hCursor: 0 as HCURSOR,
+            hbrBackground: 0 as HBRUSH,
+            lpszMenuName: 0 as LPCWSTR,
+            lpszClassName: winapi_class_name.as_ptr(),
+        };
 
-            let error_code = unsafe { RegisterClassW(&wc) };
-            assert_ne!(error_code, 0, "failed to register the window class");
+        let error_code = unsafe { RegisterClassW(&wc) };
+        assert_ne!(error_code, 0, "failed to register the window class");
 
-            let window_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindow")
-                .encode_wide()
-                .chain(once(0))
-                .collect();
+        let window_name: Vec<u16> = OsStr::new("DisplaySwitchPnPDetectWindow")
+            .encode_wide()
+            .chain(once(0))
+            .collect();
 
-            let hwnd = unsafe { CreateWindowExW(
+        let hwnd = unsafe {
+            CreateWindowExW(
                 0,
                 winapi_class_name.as_ptr(),
                 window_name.as_ptr(),
@@ -147,12 +148,12 @@ impl PnPDetectWindows {
                 hinstance,
                 self as *mut Self as *mut winapi::ctypes::c_void,
                 //std::ptr::null_mut(),
-            ) };
+            )
+        };
 
-            if hwnd.is_null() {
-                panic!("Something went wrong while creating a window");
-            }
-            self.hwnd = hwnd;
-        
+        if hwnd.is_null() {
+            panic!("Something went wrong while creating a window");
+        }
+        self.hwnd = hwnd;
     }
 }

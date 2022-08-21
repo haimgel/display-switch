@@ -5,7 +5,7 @@
 
 use crate::usb::{device2str, UsbCallback};
 use anyhow::{anyhow, Result};
-use rusb::{Context, Device, HotplugBuilder, UsbContext, Registration};
+use rusb::{Context, Device, HotplugBuilder, Registration, UsbContext};
 
 /// Detection of plugged in / removed USB devices: uses "libusb" and should work on Linux
 /// and MacOS, but not on Windows: libusb does not support hotplug on Windows.
@@ -36,10 +36,10 @@ impl PnPDetectLibusb {
         if rusb::has_hotplug() {
             let context = Context::new()?;
 
-            let mut _reg: std::option::Option<Registration<rusb::Context>> = Some(
-               HotplugBuilder::new()
-                   .enumerate(true)
-                   .register(&context, Box::new(self))?,
+            let _reg: std::option::Option<Registration<rusb::Context>> = Some(
+                HotplugBuilder::new()
+                    .enumerate(true)
+                    .register(&context, Box::new(self))?,
             );
 
             loop {

@@ -91,11 +91,11 @@ impl InputSources {
 impl Configuration {
     pub fn load() -> Result<Self> {
         let config_file_name = Self::config_file_name()?;
-        let mut settings = config::Config::default();
-        settings
-            .merge(config::File::from(config_file_name.clone()))?
-            .merge(config::Environment::with_prefix("DISPLAY_SWITCH"))?;
-        let config = settings.try_into::<Self>()?;
+        let builder = config::Config::builder()
+            .add_source(config::File::from(config_file_name.clone()))
+            .add_source(config::Environment::with_prefix("DISPLAY_SWITCH"));
+
+        let config = builder.build()?.try_deserialize()?;
         info!("Configuration loaded ({:?}): {:?}", config_file_name, config);
         Ok(config)
     }
@@ -180,9 +180,10 @@ mod tests {
     }
 
     fn load_test_config(config_str: &str) -> Result<Configuration, ConfigError> {
-        let mut settings = config::Config::default();
-        settings.merge(config::File::from_str(config_str, Ini)).unwrap();
-        settings.try_into::<Configuration>()
+        config::Config::builder()
+            .add_source(config::File::from_str(config_str, Ini))
+            .build()?
+            .try_deserialize()
     }
 
     #[test]
