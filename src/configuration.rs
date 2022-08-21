@@ -180,9 +180,10 @@ mod tests {
     }
 
     fn load_test_config(config_str: &str) -> Result<Configuration, ConfigError> {
-        let mut settings = config::Config::default();
-        settings.merge(config::File::from_str(config_str, Ini)).unwrap();
-        settings.try_into::<Configuration>()
+        config::Config::builder()
+            .add_source(config::File::from_str(config_str, Ini))
+            .build()?
+            .try_deserialize()
     }
 
     #[test]
