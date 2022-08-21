@@ -36,7 +36,7 @@ impl PnPDetectLibusb {
         if rusb::has_hotplug() {
             let context = Context::new()?;
 
-            let mut _reg: std::option::Option<Registration<rusb::Context>> = Some(
+            let _reg: std::option::Option<Registration<rusb::Context>> = Some(
                HotplugBuilder::new()
                    .enumerate(true)
                    .register(&context, Box::new(self))?,
