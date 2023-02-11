@@ -63,9 +63,8 @@ on_usb_connect = "hdmi2"
 `LEN P27u-10 S/N 1144206897` monitor ID. If more than one section has a match, a first one will be used.
 `on_usb_connect` and `on_usb_disconnect`, if defined, take precedence over global defaults.
 
-_Tips for Windows_: monitors can be renamed at
-`\HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Enum\DISPLAY\{MODEL_ID}\{CONNECTION_ID}\DeviceDesc` after the last semicolon
-in case they are all just "Generic PnP Monitor".
+_Tips for Windows_: monitors can be renamed in the Registry at
+`\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\DISPLAY\{MODEL_ID}\{CONNECTION_ID}`. Edit the `DeviceDesc` value and change the name after the last semicolon. This is especially helpful in case they are all just "Generic PnP Monitor".
 
 ### Running external commands
 `display-switch` supports running external commands upon connection or disconnection of USB devices. This configuration
