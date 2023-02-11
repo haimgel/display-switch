@@ -109,6 +109,8 @@ $ opendiff a b
 In the command output, the highlighted lines show you which USB IDs are most relevant.
 
 #### Linux
+Requires additional packages, install via: `sudo apt install libxi-dev xorg-dev`
+
 To locate the ID of your USB device on Linux, first install `lsusb`, which your Linux
 distro should have a package for. (On Debian, Ubuntu and RedHat, the package name is `usbutils`.)
 Then, in a terminal, run the following:
