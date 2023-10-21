@@ -40,6 +40,25 @@ pub fn wake_displays() -> Result<()> {
 
 #[cfg(target_os = "linux")]
 pub fn wake_displays() -> Result<()> {
+    use anyhow::Context;
+    use std::{thread, time};
+    use uinput::{Device, event::keyboard};
+
+    fn make_kbd_device() -> Result<Device> {
+        Ok(uinput::default()?
+            .name("display-switch")?
+            .event(uinput::event::Keyboard::All)?
+            .create()?)
+    }
+
+    let mut device = make_kbd_device().context("Couldn't wake displays: couldn't configure uinput")?;
+
+    // This sleep appears to be necessary based on testing.
+    // Possibly X does not immediately recognize the new device?
+    thread::sleep(time::Duration::from_secs(1));
+
+    device.click(&keyboard::Key::RightAlt)?;
+    device.synchronize()?;
     Ok(())
 }
 
