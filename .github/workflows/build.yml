@@ -22,9 +22,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install libudev-dev
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           # https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
           path: |
@@ -43,7 +43,7 @@ jobs:
       - name: Run executable
         run: ./target/release/display_switch --version
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ runner.os }}
           if-no-files-found: error
