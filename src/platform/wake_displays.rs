@@ -40,7 +40,6 @@ pub fn wake_displays() -> Result<()> {
 
 #[cfg(target_os = "linux")]
 pub fn wake_displays() -> Result<()> {
-    use anyhow::Context;
     use std::{thread, time};
     use uinput::event::controller::Controller::Mouse;
     use uinput::event::controller::Mouse::Left;
