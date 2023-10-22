@@ -11,7 +11,7 @@ pub fn device2str<T: UsbContext>(device: rusb::Device<T>) -> Option<String> {
         .ok()
 }
 
-pub trait UsbCallback {
+pub trait UsbCallback: Send {
     fn device_added(&self, device_id: &str);
     fn device_removed(&self, device_id: &str);
 }
