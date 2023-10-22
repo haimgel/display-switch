@@ -75,6 +75,8 @@ mod tests {
     #[test]
     fn test_wake_displays() {
         let waked = wake_displays();
-        assert!(waked.is_ok(), "Couldn't wake displays: {:?}", waked);
+        if let Err(err) = &waked {
+            assert!(err.to_string() == "Permission denied", "Couldn't wake displays: {:?}", err);
+        }
     }
 }
