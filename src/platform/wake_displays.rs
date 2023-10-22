@@ -68,6 +68,7 @@ mod tests {
 
     #[test]
     fn test_wake_displays() {
-        assert!(wake_displays().is_ok());
+        let waked = wake_displays();
+        assert!(waked.is_ok(), "Couldn't wake displays: {:?}", waked);
     }
 }
