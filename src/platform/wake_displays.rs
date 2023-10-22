@@ -40,6 +40,31 @@ pub fn wake_displays() -> Result<()> {
 
 #[cfg(target_os = "linux")]
 pub fn wake_displays() -> Result<()> {
+    use anyhow::Context;
+    use std::{thread, time};
+    use uinput::event::controller::Controller::Mouse;
+    use uinput::event::controller::Mouse::Left;
+    use uinput::event::Event::{Controller, Relative};
+    use uinput::event::relative::Position::X;
+    use uinput::event::relative::Relative::Position;
+
+    let mut device = uinput::default()?
+            .name("display-switch")?
+            // It's necessary to enable any mouse button. Otherwise Relative events would not work.
+            .event(Controller(Mouse(Left)))?
+            .event(Relative(Position(X)))?
+            .create()?;
+
+
+    // This sleep appears to be necessary based on testing.
+    // Possibly X does not immediately recognize the new device?
+    thread::sleep(time::Duration::from_secs(1));
+
+    device.send(X, -1)?;
+    device.synchronize()?;
+    thread::sleep(time::Duration::from_millis(50));
+    device.send(X, 1)?;
+    device.synchronize()?;
     Ok(())
 }
 
@@ -49,6 +74,9 @@ mod tests {
 
     #[test]
     fn test_wake_displays() {
-        assert!(wake_displays().is_ok());
+        let waked = wake_displays();
+        if let Err(err) = &waked {
+            assert!(err.to_string() == "Permission denied", "Couldn't wake displays: {:?}", err);
+        }
     }
 }
