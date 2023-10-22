@@ -42,22 +42,28 @@ pub fn wake_displays() -> Result<()> {
 pub fn wake_displays() -> Result<()> {
     use anyhow::Context;
     use std::{thread, time};
-    use uinput::{Device, event::keyboard};
+    use uinput::event::controller::Controller::Mouse;
+    use uinput::event::controller::Mouse::Left;
+    use uinput::event::Event::{Controller, Relative};
+    use uinput::event::relative::Position::X;
+    use uinput::event::relative::Relative::Position;
 
-    fn make_kbd_device() -> Result<Device> {
-        Ok(uinput::default()?
+    let mut device = uinput::default()?
             .name("display-switch")?
-            .event(uinput::event::Keyboard::All)?
-            .create()?)
-    }
+            // It's necessary to enable any mouse button. Otherwise Relative events would not work.
+            .event(Controller(Mouse(Left)))?
+            .event(Relative(Position(X)))?
+            .create()?;
 
-    let mut device = make_kbd_device().context("Couldn't wake displays: couldn't configure uinput")?;
 
     // This sleep appears to be necessary based on testing.
     // Possibly X does not immediately recognize the new device?
     thread::sleep(time::Duration::from_secs(1));
 
-    device.click(&keyboard::Key::RightAlt)?;
+    device.send(X, -1)?;
+    device.synchronize()?;
+    thread::sleep(time::Duration::from_millis(50));
+    device.send(X, 1)?;
     device.synchronize()?;
     Ok(())
 }
