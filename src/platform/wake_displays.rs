@@ -43,9 +43,9 @@ pub fn wake_displays() -> Result<()> {
     use std::{thread, time};
     use uinput::event::controller::Controller::Mouse;
     use uinput::event::controller::Mouse::Left;
-    use uinput::event::Event::{Controller, Relative};
     use uinput::event::relative::Position::X;
     use uinput::event::relative::Relative::Position;
+    use uinput::event::Event::{Controller, Relative};
 
     let mut device = uinput::default()?
             .name("display-switch")?
@@ -53,7 +53,6 @@ pub fn wake_displays() -> Result<()> {
             .event(Controller(Mouse(Left)))?
             .event(Relative(Position(X)))?
             .create()?;
-
 
     // This sleep appears to be necessary based on testing.
     // Possibly X does not immediately recognize the new device?
@@ -75,7 +74,11 @@ mod tests {
     fn test_wake_displays() {
         let waked = wake_displays();
         if let Err(err) = &waked {
-            assert!(err.to_string() == "Permission denied", "Couldn't wake displays: {:?}", err);
+            assert!(
+                err.to_string() == "Permission denied",
+                "Couldn't wake displays: {:?}",
+                err
+            );
         }
     }
 }
