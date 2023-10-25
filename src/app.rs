@@ -47,7 +47,7 @@ impl App {
 
     pub fn run(self) -> Result<()> {
         display_control::log_current_source();
-        let pnp_detector = PnPDetect::new(Box::new(self));
+        let pnp_detector = PnPDetect::new(&self);
         pnp_detector.detect()?;
 
         Ok(())
