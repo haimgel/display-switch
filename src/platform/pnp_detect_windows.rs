@@ -22,14 +22,14 @@ use winapi::um::winuser::{
 /// Detection of plugged in / removed USB devices on Windows: listens for WM_DEVICECHANGE messages.
 /// This code should be removed once libusb supports hotplug notifications on Windows:
 /// https://github.com/libusb/libusb/issues/86
-pub struct PnPDetectWindows<'a> {
+pub struct PnPDetectWindows {
     hwnd: HWND,
-    callback: &'a dyn UsbCallback,
+    callback: Box<dyn UsbCallback>,
     current_devices: HashSet<String>,
 }
 
-impl<'a> PnPDetectWindows<'a> {
-    pub fn new(callback: &'a (dyn UsbCallback + 'a)) -> Self {
+impl PnPDetectWindows {
+    pub fn new(callback: Box<dyn UsbCallback>) -> Self {
         let mut pnp_detect = Self {
             callback,
             current_devices: Self::read_device_list().unwrap_or_default(),
