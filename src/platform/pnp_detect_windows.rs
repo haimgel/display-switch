@@ -29,12 +29,12 @@ pub struct PnPDetectWindows {
 }
 
 impl PnPDetectWindows {
-    pub fn new(callback: Box<dyn UsbCallback>) -> Self {
-        let mut pnp_detect = Self {
+    pub fn new(callback: Box<dyn UsbCallback>) -> Box<Self> {
+        let mut pnp_detect = Box::new(Self {
             callback,
             current_devices: Self::read_device_list().unwrap_or_default(),
             hwnd: std::ptr::null_mut(),
-        };
+        });
         pnp_detect.create_window();
         return pnp_detect;
     }
@@ -95,8 +95,8 @@ impl PnPDetectWindows {
                 PostQuitMessage(0);
             }
             WM_DEVICECHANGE => {
-                let self_ptr = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut Self;
-                let window_state: &mut Self = self_ptr.as_mut().unwrap();
+                let self_ptr = GetWindowLongPtrW(hwnd, GWLP_USERDATA);
+                let window_state: &mut Self = &mut *(self_ptr as *mut Self);
                 window_state.handle_hotplug_event();
             }
             _ => return DefWindowProcW(hwnd, msg, wparam, lparam),
@@ -146,8 +146,7 @@ impl PnPDetectWindows {
                 std::ptr::null_mut(),
                 std::ptr::null_mut(),
                 hinstance,
-                self as *mut Self as *mut winapi::ctypes::c_void,
-                //std::ptr::null_mut(),
+                self as *mut _ as *mut _,
             )
         };
 
