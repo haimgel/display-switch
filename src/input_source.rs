@@ -78,25 +78,28 @@ impl InputSource {
     }
 }
 
+fn parse_int(s: &str) -> Result<u16, std::num::ParseIntError> {
+    if s.starts_with("0x") {
+        // Parse as hexadecimal
+        u16::from_str_radix(&s[2..], 16)
+    } else {
+        // Parse as decimal
+        s.parse::<u16>()
+    }
+}
+
 impl<'de> Deserialize<'de> for InputSource {
     fn deserialize<D>(deserializer: D) -> Result<InputSource, D::Error>
     where
         D: Deserializer<'de>,
     {
         let str = String::deserialize(deserializer)?.trim().to_lowercase();
-        let val = SymbolicInputSource::try_from(str.as_str());
-        if let Ok(sym) = val {
-            Ok(Self::Symbolic(sym))
-        } else {
-            let result;
-            if str.starts_with("0x") {
-                result = u16::from_str_radix(str.trim_start_matches("0x"), 16);
-            } else {
-                result = u16::from_str_radix(&str, 10);
-            }
-            result
-                .map(|val| Self::Raw(val).normalize())
-                .map_err(|err| D::Error::custom(format!("{:?}", err)))
+        if let Ok(val) = parse_int(&str) {
+            Ok(Self::Raw(val).normalize())
+        }else {
+            SymbolicInputSource::try_from(str.as_str())
+                .map(Self::Symbolic)
+                .map_err(|_| D::Error::custom(format!("Invalid input source: {}", str)))
         }
     }
 }
