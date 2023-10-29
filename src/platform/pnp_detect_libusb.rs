@@ -28,8 +28,8 @@ impl<T: UsbContext> rusb::Hotplug<T> for PnPDetectLibusb {
 }
 
 impl PnPDetectLibusb {
-    pub fn new(callback: Box<dyn UsbCallback + Send>) -> Self {
-        PnPDetectLibusb { callback }
+    pub fn new(callback: Box<dyn UsbCallback + Send>) -> Box<Self> {
+        Box::new(PnPDetectLibusb { callback })
     }
 
     pub fn detect(self) -> Result<()> {
