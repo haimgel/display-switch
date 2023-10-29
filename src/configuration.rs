@@ -82,8 +82,8 @@ impl InputSources {
 
     pub fn execute_command(&self, direction: SwitchDirection) -> Option<&str> {
         match direction {
-            SwitchDirection::Connect => self.on_usb_connect_execute.as_ref().map(|x| &**x),
-            SwitchDirection::Disconnect => self.on_usb_disconnect_execute.as_ref().map(|x| &**x),
+            SwitchDirection::Connect => self.on_usb_connect_execute.as_deref(),
+            SwitchDirection::Disconnect => self.on_usb_disconnect_execute.as_deref(),
         }
     }
 }

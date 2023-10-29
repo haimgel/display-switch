@@ -101,9 +101,9 @@ impl<'de> Deserialize<'de> for InputSource {
     }
 }
 
-impl Into<u16> for InputSource {
-    fn into(self) -> u16 {
-        self.value()
+impl From<InputSource> for u16 {
+    fn from(val: InputSource) -> Self {
+        val.value()
     }
 }
 

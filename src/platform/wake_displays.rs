@@ -23,7 +23,7 @@ pub fn wake_displays() -> Result<()> {
     use anyhow::anyhow;
     use std::process::Command;
 
-    match Command::new("/usr/bin/caffeinate").args(&["-u", "-t", "10"]).status() {
+    match Command::new("/usr/bin/caffeinate").args(["-u", "-t", "10"]).status() {
         Ok(status) => {
             if status.success() {
                 Ok(())

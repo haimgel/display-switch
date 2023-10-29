@@ -7,7 +7,7 @@ use crate::input_source::InputSource;
 
 use anyhow::{Error, Result};
 use ddc_hi::{Ddc, Display, Handle};
-use shell_words;
+
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
 use std::{thread, time};
@@ -85,7 +85,7 @@ fn displays() -> Vec<Display> {
         delay_duration.as_secs()
     );
     thread::sleep(delay_duration);
-    return Display::enumerate();
+    Display::enumerate()
 }
 
 pub fn log_current_source() {
@@ -146,7 +146,7 @@ fn run_command(execute_command: &str) {
 
         let executable = arguments.remove(0);
         let output = Command::new(executable).args(arguments).stdin(Stdio::null()).output()?;
-        return if output.status.success() {
+        if output.status.success() {
             info!("External command '{}' executed successfully", execute_command);
             Ok(())
         } else {
@@ -159,7 +159,7 @@ fn run_command(execute_command: &str) {
                 if let Ok(s) = String::from_utf8(output.stdout) {
                     format!("Stdout = [{}]\n", s)
                 } else {
-                    format!("Stdout was not UTF-8")
+                    "Stdout was not UTF-8".to_string()
                 }
             } else {
                 "No stdout\n".to_string()
@@ -168,13 +168,13 @@ fn run_command(execute_command: &str) {
                 if let Ok(s) = String::from_utf8(output.stderr) {
                     format!("Stderr = [{}]\n", s)
                 } else {
-                    format!("Stderr was not UTF-8")
+                    "Stderr was not UTF-8".to_string()
                 }
             } else {
                 "No stderr\n".to_string()
             };
             Err(Error::msg(format!("{} {} {}", msg, stdout, stderr)))
-        };
+        }
     }
 
     try_run_command(execute_command)
