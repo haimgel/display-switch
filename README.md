@@ -89,6 +89,7 @@ Notes:
 2. This program supports splitting supplied configuration into application name and parameters, but no other shell features are supported.
 3. If the application path contains spaces, surround the full file path with single quotes.
 4. On Windows, escape the backslashes (replace \ with \\, see the example above).
+5. Multiple commands can be chained by separating them with a semicolumn ";", like in a shell.
 
 ### USB Device IDs
 
