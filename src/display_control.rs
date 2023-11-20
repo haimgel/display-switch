@@ -177,6 +177,10 @@ fn run_command(execute_command: &str) {
         }
     }
 
-    try_run_command(execute_command)
-        .unwrap_or_else(|err| error!("Error executing external command '{}': {}", execute_command, err))
+    for subcommand in execute_command.split(";") {
+        let subcommand = subcommand.trim();
+        if !subcommand.is_empty() {
+            try_run_command(subcommand).unwrap_or_else(|err| error!("Error executing external command '{}': {}", subcommand, err));
+        }
+    }
 }
