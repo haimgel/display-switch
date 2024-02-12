@@ -16,6 +16,18 @@ use std::{thread, time};
 const INPUT_SELECT: u8 = 0x60;
 const RETRY_DELAY_MS: u64 = 3000;
 
+fn is_macos_with_m1() -> bool {
+    let output = Command::new("uname")
+        .arg("-m")
+        .output()
+        .expect("Failed to execute command");
+
+    if let Ok(output_str) = std::str::from_utf8(&output.stdout) {
+        return output_str.trim() == "arm64" && cfg!(target_os = "macos");
+    }
+    false
+}
+
 fn display_name(display: &Display, index: Option<usize>) -> String {
     // Different OSes populate different fields of ddc-hi-rs info structure differently. Create
     // a synthetic "display_name" that makes sense on each OS
@@ -71,6 +83,9 @@ fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSourc
 }
 
 fn displays() -> Vec<Display> {
+    if is_macos_with_m1() {
+        return Vec::new();
+    }
     let displays = Display::enumerate();
     if !displays.is_empty() {
         return displays;
@@ -110,6 +125,13 @@ pub fn log_current_source() {
 }
 
 pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
+    if is_macos_with_m1() {
+        info!("On MacOS M1, only execute the on_usb_[dis]connect_execute command");
+        if let Some(execute_command) = config.default_input_sources.execute_command(switch_direction) {
+            run_command(execute_command)
+        }
+        return;
+    }
     let displays = displays();
     if displays.is_empty() {
         error!("Did not detect any DDC-compatible displays!");
