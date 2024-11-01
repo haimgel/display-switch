@@ -33,6 +33,6 @@ ddc-i2c = "^0.2"
 uinput = "^0.1"
 
 [target.'cfg(target_os = "windows")'.dependencies]
-winapi = { version = "^0.3", features = ["winuser", "libloaderapi"] }
+winapi = { version = "^0.3", features = ["winuser", "libloaderapi", "wincon"] }
 ddc-winapi = "^0.2"
 nvapi = "^0.1"
