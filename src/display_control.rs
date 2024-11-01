@@ -1,5 +1,6 @@
 //
 // Copyright © 2020 Haim Gelfenbeyn
+// Copyright © 2024 Luke Nuttall
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 use crate::configuration::{Configuration, SwitchDirection};
@@ -47,12 +48,16 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
     displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
-fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource) {
+fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource, always_switch: bool) {
     match handle.get_vcp_feature(INPUT_SELECT) {
         Ok(raw_source) => {
             if raw_source.value() & 0xff == input.value() {
                 info!("Display {} is already set to {}", display_name, input);
-                return;
+                if always_switch {
+                    info!("Let's try anyway!");
+                } else {
+                    return;
+                }
             }
         }
         Err(err) => {
@@ -121,7 +126,7 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
         let input_sources = config.configuration_for_monitor(&display_name);
         debug!("Input sources found for display {}: {:?}", display_name, input_sources);
         if let Some(input) = input_sources.source(switch_direction) {
-            try_switch_display(&mut display.handle, &display_name, input);
+            try_switch_display(&mut display.handle, &display_name, input, config.always_switch);
         } else {
             info!(
                 "Display {} is not configured to switch on USB {}",
