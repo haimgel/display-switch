@@ -96,7 +96,7 @@ impl<'de> Deserialize<'de> for InputSource {
         let str = String::deserialize(deserializer)?.trim().to_lowercase();
         if let Ok(val) = parse_int(&str) {
             Ok(Self::Raw(val).normalize())
-        }else {
+        } else {
             SymbolicInputSource::try_from(str.as_str())
                 .map(Self::Symbolic)
                 .map_err(|_| D::Error::custom(format!("Invalid input source: {}", str)))
