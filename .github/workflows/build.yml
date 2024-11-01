@@ -1,6 +1,13 @@
 name: build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '**'
+    pull_request:
+      types: [opened, synchronize, reopened]
 
 env:
   CARGO_TERM_COLOR: always
@@ -23,9 +30,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install libudev-dev
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           # https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
           path: |
@@ -44,7 +51,7 @@ jobs:
       - name: Run executable
         run: ./target/release/display_switch --version
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}
           if-no-files-found: error
