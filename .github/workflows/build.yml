@@ -6,8 +6,8 @@ on:
       - main
     tags:
       - '**'
-    pull_request:
-      types: [opened, synchronize, reopened]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 env:
   CARGO_TERM_COLOR: always
