@@ -184,14 +184,15 @@ dependencies = [
 [[package]]
 name = "ddc-macos"
 version = "0.2.2"
-source = "git+https://github.com/haimgel/ddc-macos-rs.git?branch=feature/mac-m3-support#a1355251f6b6300f6c143791f2efff3c06a2ff0a"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28aca22e30b33daf41a5d269a19b00588adf5242ed5525d3818195de17a534dc"
 dependencies = [
  "core-foundation",
  "core-foundation-sys",
  "core-graphics",
  "ddc",
  "io-kit-sys",
- "mach",
+ "mach2",
  "thiserror",
 ]
 
@@ -253,7 +254,6 @@ dependencies = [
  "paste",
  "rusb",
  "serde",
- "serde_json",
  "shell-words",
  "simplelog",
  "uinput",
@@ -463,15 +463,6 @@ name = "log"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
-
-[[package]]
-name = "mach"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b823e83b2affd8f40a9ee8c29dbc56404c1e34cd2710921f2801e2cf29527afa"
-dependencies = [
- "libc",
-]
 
 [[package]]
 name = "mach2"
@@ -714,12 +705,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ryu"
-version = "1.0.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3cb5ba0dc43242ce17de99c180e96db90b235b8a9fdc9543c96d2209116bd9f"
-
-[[package]]
 name = "serde"
 version = "1.0.214"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -737,18 +722,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "serde_json"
-version = "1.0.132"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d726bfaff4b320266d395898905d0eba0345aae23b54aee3a737e260fd46db03"
-dependencies = [
- "itoa",
- "memchr 2.7.4",
- "ryu",
- "serde",
 ]
 
 [[package]]
