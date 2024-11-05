@@ -18,12 +18,11 @@ log = "0.4"
 simplelog = "0.12"
 ddc = "0.2"
 ddc-hi = "0.4"
-ddc-macos = "0.2.2"
 rusb = "^0.9"
 shell-words = "1.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-ddc-macos = "0.2"
+ddc-macos = "0.2.2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 ddc-i2c = "0.2"
