@@ -8,7 +8,6 @@ use std::ffi::OsStr;
 use std::iter::once;
 use std::os::windows::ffi::OsStrExt;
 
-use crate::usb::{device2str, UsbCallback};
 use anyhow::{anyhow, Result};
 use winapi::shared::minwindef::{LPARAM, LRESULT, UINT, WPARAM};
 use winapi::shared::ntdef::LPCWSTR;
@@ -24,12 +23,12 @@ use winapi::um::winuser::{
 /// https://github.com/libusb/libusb/issues/86
 pub struct PnPDetectWindows {
     hwnd: HWND,
-    callback: Box<dyn UsbCallback>,
+    callback: Box<dyn crate::usb::UsbCallback>,
     current_devices: HashSet<String>,
 }
 
 impl PnPDetectWindows {
-    pub fn new(callback: Box<dyn UsbCallback>) -> Box<Self> {
+    pub fn new(callback: Box<dyn crate::usb::UsbCallback>) -> Box<Self> {
         let mut pnp_detect = Box::new(Self {
             callback,
             current_devices: Self::read_device_list().unwrap_or_default(),
@@ -62,7 +61,7 @@ impl PnPDetectWindows {
     fn read_device_list() -> Result<HashSet<String>> {
         Ok(rusb::devices()?
             .iter()
-            .map(|device| device2str(device).ok_or(anyhow!("Cannot get device Ids")))
+            .map(|device| crate::usb::device_id(&device).ok_or(anyhow!("Cannot get device Ids")))
             .collect::<std::result::Result<_, _>>()?)
     }
 
