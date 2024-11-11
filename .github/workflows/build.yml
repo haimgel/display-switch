@@ -13,48 +13,87 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: full
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  crate_metadata:
+    name: Extract crate metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract crate information
+        id: crate_metadata
+        run: |
+          cargo metadata --no-deps --format-version 1 | jq -r '"name=" + .packages[0].name' | tee -a $GITHUB_OUTPUT
+          cargo metadata --no-deps --format-version 1 | jq -r '"version=" + .packages[0].version' | tee -a $GITHUB_OUTPUT
+    outputs:
+      name: ${{ steps.crate_metadata.outputs.name }}
+      version: ${{ steps.crate_metadata.outputs.version }}
+
   build:
+    name: Build (${{ matrix.job.short_target }})
+    needs: [crate_metadata]
     strategy:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        job:
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, short_target: linux-amd64 }
+          - { os: macos-latest, target: universal2-apple-darwin, short_target: macos-universal }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, short_target: windows-amd64 }
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.job.os }}
 
     steps:
       - name: Install build dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.job.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install libudev-dev
 
+      - name: Install build dependencies (Windows)
+        if: matrix.job.os == 'windows-latest'
+        run: |
+          choco install zip -y
+
       - uses: actions/checkout@v4
 
-      - uses: actions/cache@v4
-        with:
-          # https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: Swatinem/rust-cache@v2
 
       - name: Build
-        run: cargo build --release
+        run: make build-release
 
       - name: Run tests
-        run: cargo test
+        run: make test
 
       - name: Run executable
         run: ./target/release/display_switch --version
 
+      - name: Package
+        id: package
+        shell: bash
+        run: |
+          PACKAGE_DIR="target/package"
+          mkdir -p "$PACKAGE_DIR"
+          PACKAGE_NAME="display_switch-v${{ needs.crate_metadata.outputs.version }}-${{ matrix.job.short_target }}.zip"
+          PACKAGE_FILE="$PACKAGE_DIR/$PACKAGE_NAME"
+          shopt -s extglob # To match the filename below (without any debug symbols)
+          zip -j $PACKAGE_FILE target/release/display_switch?(.exe) README.md LICENSE
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "PACKAGE_FILE=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}
           if-no-files-found: error
-          path: |
-            target/release/display_switch
-            target/release/display_switch.exe
+          name: ${{ steps.package.outputs.PACKAGE_NAME }}
+          path: ${{ steps.package.outputs.PACKAGE_FILE }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true # temporary, for testing
+          generate_release_notes: true
+          files: ${{ steps.package.outputs.PACKAGE_FILE }}
