@@ -14,15 +14,31 @@ env:
   RUST_BACKTRACE: full
 
 jobs:
+  crate_metadata:
+    name: Extract crate metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract crate information
+        id: crate_metadata
+        run: |
+          cargo metadata --no-deps --format-version 1 | jq -r '"name=" + .packages[0].name' | tee -a $GITHUB_OUTPUT
+          cargo metadata --no-deps --format-version 1 | jq -r '"version=" + .packages[0].version' | tee -a $GITHUB_OUTPUT
+    outputs:
+      name: ${{ steps.crate_metadata.outputs.name }}
+      version: ${{ steps.crate_metadata.outputs.version }}
+
   build:
+    name: Build (${{ matrix.job.short_target }})
+    needs: [crate_metadata]
     strategy:
       fail-fast: false
       max-parallel: 3
       matrix:
         job:
-          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
-          - { os: macos-latest, target: universal2-apple-darwin }
-          - { os: windows-latest, target: x86_64-pc-windows-msvc }
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, short_target: linux-amd64 }
+          - { os: macos-latest, target: universal2-apple-darwin, short_target: macos-universal }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, short_target: windows-amd64 }
 
     runs-on: ${{ matrix.job.os }}
 
@@ -46,10 +62,20 @@ jobs:
       - name: Run executable
         run: ./target/release/display_switch --version
 
+      - name: Package
+        id: package
+        shell: bash
+        run: |
+          PACKAGE_DIR="target/package"
+          mkdir -p "$PACKAGE_DIR"
+          PACKAGE_NAME="display_switch-v${{ needs.crate_metadata.outputs.version }}-${{ matrix.job.short_target }}.zip"
+          PACKAGE_FILE="$PACKAGE_DIR/$PACKAGE_NAME"
+          zip -j $PACKAGE_FILE target/release/display_switch* README.md LICENSE
+          echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "PACKAGE_FILE=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}
           if-no-files-found: error
-          path: |
-            target/release/display_switch
-            target/release/display_switch.exe
+          name: ${{ steps.package.outputs.PACKAGE_NAME }}
+          path: ${{ steps.package.outputs.PACKAGE_FILE }}
