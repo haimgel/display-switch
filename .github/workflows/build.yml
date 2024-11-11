@@ -18,23 +18,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  crate_metadata:
+  meta:
     name: Extract crate metadata
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Extract crate information
-        id: crate_metadata
+        id: meta
         run: |
           cargo metadata --no-deps --format-version 1 | jq -r '"name=" + .packages[0].name' | tee -a $GITHUB_OUTPUT
           cargo metadata --no-deps --format-version 1 | jq -r '"version=" + .packages[0].version' | tee -a $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" | tee -a $GITHUB_OUTPUT
     outputs:
-      name: ${{ steps.crate_metadata.outputs.name }}
-      version: ${{ steps.crate_metadata.outputs.version }}
+      name: ${{ steps.meta.outputs.name }}
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
 
   build:
     name: Build (${{ matrix.job.short_target }})
-    needs: [crate_metadata]
+    needs: [meta]
     strategy:
       fail-fast: false
       max-parallel: 3
@@ -77,12 +79,16 @@ jobs:
         run: |
           PACKAGE_DIR="target/package"
           mkdir -p "$PACKAGE_DIR"
-          PACKAGE_NAME="display_switch-v${{ needs.crate_metadata.outputs.version }}-${{ matrix.job.short_target }}.zip"
+          PACKAGE_NAME="display_switch-v${{ needs.meta.outputs.version }}-${{ matrix.job.short_target }}.zip"
           PACKAGE_FILE="$PACKAGE_DIR/$PACKAGE_NAME"
           shopt -s extglob # To match the filename below (without any debug symbols)
           zip -j $PACKAGE_FILE target/release/display_switch?(.exe) README.md LICENSE
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           echo "PACKAGE_FILE=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+          if [[ ${{ matrix.job.os }} == 'macos-latest' ]]; then
+            echo "HOMEBREW_PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+            echo "HOMEBREW_PACKAGE_HASH=$(sha256 -q $PACKAGE_FILE)" >> $GITHUB_OUTPUT
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
@@ -94,6 +100,29 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          draft: true # temporary, for testing
+          prerelease: ${{ contains(github.ref, 'prerelease') }}
           generate_release_notes: true
           files: ${{ steps.package.outputs.PACKAGE_FILE }}
+
+    outputs:
+      packages: ${{ steps.package.outputs.PACKAGE_NAME }}
+      homebrew_package_name: ${{ steps.package.outputs.HOMEBREW_PACKAGE_NAME }}
+      homebrew_package_hash: ${{ steps.package.outputs.HOMEBREW_PACKAGE_HASH }}
+
+  update_homebrew:
+    name: Update Homebrew formula
+    needs: [meta, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Homebrew formula
+        uses: mislav/bump-homebrew-formula-action@v3
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          formula-name: display_switch
+          tag-name: ${{ needs.meta.outputs.tag }}
+          homebrew-tap: haimgel/tools
+          download-url: https://github.com/haimgel/display-switch/releases/download/${{ needs.meta.outputs.tag }}/${{ needs.build.outputs.homebrew_package_name }}
+          download-sha256: ${{ needs.build.outputs.homebrew_package_hash }}
+        env:
+          COMMITTER_TOKEN: ${{ secrets.RELEASER_GITHUB_TOKEN }}
