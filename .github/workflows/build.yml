@@ -121,7 +121,7 @@ jobs:
         with:
           formula-name: display_switch
           tag-name: ${{ needs.meta.outputs.tag }}
-          homebrew-tap: haimgel/tools
+          homebrew-tap: haimgel/homebrew-tools
           download-url: https://github.com/haimgel/display-switch/releases/download/${{ needs.meta.outputs.tag }}/${{ needs.build.outputs.homebrew_package_name }}
           download-sha256: ${{ needs.build.outputs.homebrew_package_hash }}
         env:
