@@ -4,13 +4,19 @@ ARM_ARCH := aarch64-apple-darwin
 UNAME_S := $(shell uname -s)
 
 # Targets for different build modes
-.PHONY: build-debug build-release all test clean
+.PHONY: build-debug build-release all test clean setup-$(INTEL_ARCH) setup-$(ARM_ARCH)
 
 # macOS specific debug build: creates a universal debug binary
 ifeq ($(UNAME_S), Darwin)
 build-debug: target/debug/$(BINARY)
 
 build-release: target/release/$(BINARY)
+
+setup-$(INTEL_ARCH):
+	rustup target add $(INTEL_ARCH)
+
+setup-$(ARM_ARCH):
+	rustup target add $(ARM_ARCH)
 
 target/debug/$(BINARY): target/$(INTEL_ARCH)/debug/$(BINARY) target/$(ARM_ARCH)/debug/$(BINARY)
 	mkdir -p "target/debug"
@@ -24,18 +30,16 @@ target/release/$(BINARY): target/$(INTEL_ARCH)/release/$(BINARY) target/$(ARM_AR
 		"target/$(INTEL_ARCH)/release/$(BINARY)" \
 		"target/$(ARM_ARCH)/release/$(BINARY)"
 
-target/$(INTEL_ARCH)/debug/$(BINARY):
-	rustup target add $(INTEL_ARCH)
+target/$(INTEL_ARCH)/debug/$(BINARY): setup-$(INTEL_ARCH)
 	cargo build --target $(INTEL_ARCH)
 
-target/$(ARM_ARCH)/debug/$(BINARY):
-	rustup target add $(ARM_ARCH)
+target/$(ARM_ARCH)/debug/$(BINARY): setup-$(ARM_ARCH)
 	cargo build --target $(ARM_ARCH)
 
-target/$(INTEL_ARCH)/release/$(BINARY):
+target/$(INTEL_ARCH)/release/$(BINARY): setup-$(INTEL_ARCH)
 	cargo build --target $(INTEL_ARCH) --release
 
-target/$(ARM_ARCH)/release/$(BINARY):
+target/$(ARM_ARCH)/release/$(BINARY): setup-$(ARM_ARCH)
 	cargo build --target $(ARM_ARCH) --release
 
 # Non-macOS build: defaults to standard cargo build
