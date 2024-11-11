@@ -43,10 +43,10 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build
-        run: cargo build --release
+        run: make build-release
 
       - name: Run tests
-        run: cargo test
+        run: make test
 
       - name: Run executable
         run: ./target/release/display_switch --version
