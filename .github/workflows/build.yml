@@ -91,6 +91,9 @@ jobs:
           path: ${{ steps.package.outputs.PACKAGE_FILE }}
 
       - name: Release
-        uses: actions/download-artifact@v2
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: ${{ needs.build.outputs.PACKAGE_NAME }}
+          draft: true # temporary, for testing
+          generate_release_notes: true
+          files: ${{ steps.package.outputs.PACKAGE_FILE }}
