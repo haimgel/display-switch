@@ -56,7 +56,7 @@ jobs:
       - name: Install build dependencies (Windows)
         if: matrix.job.os == 'windows-latest'
         run: |
-          choco install zip -y
+          choco install zip shasum -y
 
       - uses: actions/checkout@v4
 
