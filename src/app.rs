@@ -40,6 +40,12 @@ impl usb::UsbCallback for App {
 impl App {
     pub fn new() -> Result<Self> {
         logging::init_logging().context("failed to initialize logging")?;
+        info!(
+            "display-switch v{version} built on {timestamp} from git {git}",
+            version = env!("CARGO_PKG_VERSION"),
+            timestamp = env!("VERGEN_BUILD_TIMESTAMP"),
+            git = env!("VERGEN_GIT_DESCRIBE"),
+        );
         let config = Configuration::load().context("failed to load configuration")?;
 
         Ok(Self { config })

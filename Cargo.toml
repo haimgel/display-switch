@@ -6,6 +6,8 @@ edition = "2021"
 description = "An utility to watch for USB device connect/disconnect events and switch display inputs via DDC/CI"
 readme = "README.md"
 repository = "https://github.com/haimgel/display-switch/"
+homepage = "https://github.com/haimgel/display-switch/"
+build = "build.rs"
 license = "MIT"
 
 [dependencies]
@@ -20,6 +22,9 @@ ddc = "0.2"
 ddc-hi = "0.4"
 rusb = "^0.9"
 shell-words = "1.0"
+
+[build-dependencies]
+vergen-git2 = { version = "1.0.0", features = ["build", "cargo"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 ddc-macos = "0.2.2"
