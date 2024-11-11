@@ -13,6 +13,10 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: full
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   crate_metadata:
     name: Extract crate metadata
@@ -70,7 +74,8 @@ jobs:
           mkdir -p "$PACKAGE_DIR"
           PACKAGE_NAME="display_switch-v${{ needs.crate_metadata.outputs.version }}-${{ matrix.job.short_target }}.zip"
           PACKAGE_FILE="$PACKAGE_DIR/$PACKAGE_NAME"
-          zip -j $PACKAGE_FILE target/release/display_switch* README.md LICENSE
+          shopt -s extglob # To match the filename below (without any debug symbols)
+          zip -j $PACKAGE_FILE target/release/display_switch?(.exe) README.md LICENSE
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           echo "PACKAGE_FILE=$PACKAGE_FILE" >> $GITHUB_OUTPUT
 

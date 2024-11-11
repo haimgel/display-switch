@@ -2,6 +2,7 @@ BINARY := display_switch
 INTEL_ARCH := x86_64-apple-darwin
 ARM_ARCH := aarch64-apple-darwin
 UNAME_S := $(shell uname -s)
+VERSION := $(shell cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
 
 # Targets for different build modes
 .PHONY: build-debug build-release all test clean setup-$(INTEL_ARCH) setup-$(ARM_ARCH)
@@ -58,3 +59,10 @@ test:
 
 clean:
 	cargo clean
+
+package-release: build-release
+	mkdir -p "target/package"
+	zip -j target/package/$(BINARY)-v$(VERSION)-$(PLATFORM).zip target/release/$(BINARY)* README.md LICENSE
+	cp README.md LICENSE target/release/$(BINARY) target/package
+	cd target/package && zip -r $(BINARY)-v$(VERSION)-$(PLATFORM).zip $(BINARY) README.md LICENSE
+	echo "$(BINARY)-v$(VERSION)-$(PLATFORM).zip"
