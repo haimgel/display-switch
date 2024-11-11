@@ -19,28 +19,23 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        job:
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu }
+          - { os: macos-latest, target: universal2-apple-darwin }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc }
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.job.os }}
 
     steps:
       - name: Install build dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.job.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install libudev-dev
 
       - uses: actions/checkout@v4
 
-      - uses: actions/cache@v4
-        with:
-          # https://doc.rust-lang.org/cargo/guide/cargo-home.html#caching-the-cargo-home-in-ci
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: Swatinem/rust-cache@v2
 
       - name: Build
         run: make build-release
