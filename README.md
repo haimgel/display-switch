@@ -12,10 +12,15 @@ monitors "one way" and relies on itself running on the other computers to switch
  
 ## Platforms supported
 
-The app should function on MacOS (Intel Macs only), Windows, and Linux.
+The app should function on MacOS, Windows, and Linux.
 
-**NOTE:** Display Switch is currently **not** working on M1 Macs: M1 series SoC support in `ddc-macos-rs` is planned but is not 
-[implemented yet](https://github.com/haimgel/ddc-macos-rs/issues/2).
+## Installation
+ * Linux and Windows: download and extract the files from the releases page and place them where
+   you see fit.
+ * MacOS: `display_switch` can be installed with Homebrew:
+   ```bash
+   brew install haimgel/tools/display_switch
+   ```
 
 ## Configuration
 
