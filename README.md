@@ -116,6 +116,13 @@ $ opendiff a b
 ```
 In the command output, the highlighted lines show you which USB IDs are most relevant.
 
+
+For a full list of USB devices:
+```
+system_profiler SPUSBDataType
+```
+**Important**: The format for your display-switch.ini is VendorID:ProductID. VendorID is displyed *second* in the `system_profiler` output
+
 #### Linux
 Requires additional packages, install via: `sudo apt install libxi-dev xorg-dev`
 
