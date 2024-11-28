@@ -24,6 +24,9 @@ mod usb;
 #[derive(Parser, Debug)]
 #[command(version)]
 struct Args {
+    /// Print debug information
+    #[arg(short, long, default_value_t = false)]
+    debug: bool,
 }
 
 /// On Windows, re-attach the console, if parent process has the console. This allows
@@ -39,7 +42,7 @@ fn main() -> Result<()> {
     attach_console();
     let args = Args::parse();
 
-    let app = app::App::new()?;
+    let app = app::App::new(args)?;
     app.run()?;
     Ok(())
 }
