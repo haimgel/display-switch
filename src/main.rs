@@ -8,7 +8,7 @@
 extern crate log;
 
 use anyhow::Result;
-use std::env;
+use clap::Parser;
 
 #[cfg(target_os = "windows")]
 use winapi::um::wincon::{AttachConsole, ATTACH_PARENT_PROCESS};
@@ -21,6 +21,11 @@ mod logging;
 mod platform;
 mod usb;
 
+#[derive(Parser, Debug)]
+#[command(version)]
+struct Args {
+}
+
 /// On Windows, re-attach the console, if parent process has the console. This allows
 /// to see the log output when run from the command line.
 fn attach_console() {
@@ -32,12 +37,7 @@ fn attach_console() {
 
 fn main() -> Result<()> {
     attach_console();
-
-    let args: Vec<String> = env::args().collect();
-    if args.len() == 2 && args[1] == "--version" {
-        println!("{} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
-        return Ok(());
-    }
+    let args = Args::parse();
 
     let app = app::App::new()?;
     app.run()?;
