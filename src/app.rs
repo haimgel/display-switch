@@ -6,10 +6,10 @@
 use anyhow::{Context, Result};
 
 use crate::configuration::{Configuration, SwitchDirection};
-use crate::display_control;
 use crate::logging;
 use crate::platform::{wake_displays, PnPDetect};
 use crate::usb;
+use crate::{display_control, Args};
 
 pub struct App {
     config: Configuration,
@@ -38,8 +38,8 @@ impl usb::UsbCallback for App {
 }
 
 impl App {
-    pub fn new() -> Result<Self> {
-        logging::init_logging().context("failed to initialize logging")?;
+    pub fn new(args: Args) -> Result<Self> {
+        logging::init_logging(args.debug).context("failed to initialize logging")?;
         info!(
             "display-switch v{version} built on {timestamp} from git {git}",
             version = env!("CARGO_PKG_VERSION"),

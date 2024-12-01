@@ -10,16 +10,17 @@ use simplelog::*;
 
 use crate::configuration::Configuration;
 
-pub fn init_logging() -> Result<()> {
+pub fn init_logging(log_debug: bool) -> Result<()> {
+    let log_level = if log_debug {
+        LevelFilter::Debug
+    } else {
+        LevelFilter::Info
+    };
+
     Ok(CombinedLogger::init(vec![
-        TermLogger::new(
-            LevelFilter::Debug,
-            Config::default(),
-            TerminalMode::Mixed,
-            ColorChoice::Auto,
-        ),
+        TermLogger::new(log_level, Config::default(), TerminalMode::Mixed, ColorChoice::Auto),
         WriteLogger::new(
-            LevelFilter::Debug,
+            log_level,
             Config::default(),
             File::create(Configuration::log_file_name()?)?,
         ),
