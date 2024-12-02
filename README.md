@@ -35,7 +35,8 @@ Configuration file settings:
 ```ini
   usb_device = "1050:0407"
   on_usb_connect = "Hdmi1"
-  on_usb_disconnect = "Hdmi2"
+  on_usb_disconnect = "Hdmi2"  
+  always_switch = true
 ```
 
 `usb_device` is which USB device to watch (vendor id / device id in hex), and `on_usb_connect` is which monitor input
@@ -46,6 +47,10 @@ decimal or hexadecimal value: `on_usb_connect = 0x10`
 The optional `on_usb_disconnect` settings allows to switch in the other direction when the USB device is disconnected.
 Note that the preferred way is to have this app installed on both computers. Switching "away" is problematic: if the
 other computer has put the monitors to sleep, they will switch immediately back to the original input.
+
+The optional `always_switch` setting can be used to attempt to switch even if the monitor reports that it currently
+on the input we want to switch to. This is useful for Acer monitors like the XR343CRK, which pretend they are still
+connected to `DisplayPort1` or `0xF`, when you switch to USB-C using `DisplayPort2` or `0x10`.
 
 ### Different inputs on different monitors
 `display-switch` supports per-monitor configuration: add one or more monitor-specific configuration sections to set
