@@ -11,17 +11,17 @@ build = "build.rs"
 license = "MIT"
 
 [dependencies]
-config = { version = "0.14", features = ["ini"], default-features = false }
+config = { version = "0.15", features = ["ini"], default-features = false }
 paste = "1.0"
-dirs = "5.0"
+dirs = "6.0"
 serde = { version = "1.0", features = ["derive"] }
 anyhow = "1.0"
 log = "0.4"
 simplelog = "0.12"
 ddc = "0.2"
 ddc-hi = "0.4"
-rusb = "^0.9"
-shell-words = "1.0"
+rusb = "0.9"
+shell-words = "1.1"
 clap = { version = "4.5.21", features = ["derive"] }
 
 [build-dependencies]
