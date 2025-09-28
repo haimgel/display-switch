@@ -22,7 +22,7 @@ jobs:
     name: Extract crate metadata
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 #v5.0.0
       - name: Extract crate information
         id: meta
         run: |
@@ -60,9 +60,9 @@ jobs:
         run: |
           choco install zip -y
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 #v5.0.0
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 #v2.8.1
 
       - name: Build
         run: make build-release
@@ -90,14 +90,14 @@ jobs:
             echo "HOMEBREW_PACKAGE_HASH=$(sha256 -q $PACKAGE_FILE)" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
         with:
           if-no-files-found: error
           name: ${{ steps.package.outputs.PACKAGE_NAME }}
           path: ${{ steps.package.outputs.PACKAGE_FILE }}
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 #v2.3.3
         if: startsWith(github.ref, 'refs/tags/')
         with:
           prerelease: ${{ contains(github.ref, 'prerelease') }}
@@ -114,9 +114,9 @@ jobs:
     needs: [meta, build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 #v5.0.0
       - name: Update Homebrew formula
-        uses: mislav/bump-homebrew-formula-action@v3
+        uses: mislav/bump-homebrew-formula-action@56a283fa15557e9abaa4bdb63b8212abc68e655c #v3
         if: startsWith(github.ref, 'refs/tags/')
         with:
           formula-name: display_switch
