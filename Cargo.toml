@@ -1,6 +1,6 @@
 [package]
 name = "display_switch"
-version = "1.4.0"
+version = "1.4.1"
 authors = ["Haim Gelfenbeyn <haim@g8n.me>"]
 edition = "2021"
 description = "An utility to watch for USB device connect/disconnect events and switch display inputs via DDC/CI"
