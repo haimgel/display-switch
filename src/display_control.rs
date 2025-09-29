@@ -146,28 +146,27 @@ fn run_command(execute_command: &str) {
 
         let executable = arguments.remove(0);
         let output = Command::new(executable).args(arguments).stdin(Stdio::null()).output()?;
-        if output.status.success() {
-            {
-                let stdout = if !output.stdout.is_empty() {
-                    if let Ok(s) = String::from_utf8(output.stdout) {
-                        format!("Stdout = [{}]\n", s)
-                    } else {
-                        "Stdout was not UTF-8".to_string()
-                    }
-                } else {
-                    "No stdout\n".to_string()
-                };
-                let stderr = if !output.stderr.is_empty() {
-                    if let Ok(s) = String::from_utf8(output.stderr) {
-                        format!("Stderr = [{}]\n", s)
-                    } else {
-                        "Stderr was not UTF-8".to_string()
-                    }
-                } else {
-                    "No stderr\n".to_string()
-                };
-                debug!("External command output: {} {}", stdout, stderr);
+        let stdout = if !output.stdout.is_empty() {
+            if let Ok(s) = String::from_utf8(output.stdout) {
+                format!("Stdout = [{}]\n", s)
+            } else {
+                "Stdout was not UTF-8".to_string()
             }
+        } else {
+            "No stdout\n".to_string()
+        };
+        let stderr = if !output.stderr.is_empty() {
+            if let Ok(s) = String::from_utf8(output.stderr) {
+                format!("Stderr = [{}]\n", s)
+            } else {
+                "Stderr was not UTF-8".to_string()
+            }
+        } else {
+            "No stderr\n".to_string()
+        };
+
+        if output.status.success() {
+            debug!("External command output: {} {}", stdout, stderr);
             info!("External command '{}' executed successfully", execute_command);
             Ok(())
         } else {
@@ -175,24 +174,6 @@ fn run_command(execute_command: &str) {
                 format!("Exited with status {}\n", code)
             } else {
                 "Exited because of a signal\n".to_string()
-            };
-            let stdout = if !output.stdout.is_empty() {
-                if let Ok(s) = String::from_utf8(output.stdout) {
-                    format!("Stdout = [{}]\n", s)
-                } else {
-                    "Stdout was not UTF-8".to_string()
-                }
-            } else {
-                "No stdout\n".to_string()
-            };
-            let stderr = if !output.stderr.is_empty() {
-                if let Ok(s) = String::from_utf8(output.stderr) {
-                    format!("Stderr = [{}]\n", s)
-                } else {
-                    "Stderr was not UTF-8".to_string()
-                }
-            } else {
-                "No stderr\n".to_string()
             };
             Err(Error::msg(format!("{} {} {}", msg, stdout, stderr)))
         }
