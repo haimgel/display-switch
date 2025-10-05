@@ -89,14 +89,18 @@ impl InputSources {
 }
 
 impl Configuration {
-    pub fn load() -> Result<Self> {
-        let config_file_name = Self::config_file_name()?;
+    pub fn load(path: Option<&std::path::Path>) -> Result<Self> {
+        let path = match path {
+            Some(p) => p.to_path_buf(),
+            None => Self::config_file_name()?,
+        };
+
         let builder = config::Config::builder()
-            .add_source(config::File::from(config_file_name.clone()))
+            .add_source(config::File::from(path.as_path()))
             .add_source(config::Environment::with_prefix("DISPLAY_SWITCH"));
 
-        let config = builder.build()?.try_deserialize()?;
-        info!("Configuration loaded ({:?}): {:?}", config_file_name, config);
+        let config: Self = builder.build()?.try_deserialize()?;
+        info!("Configuration loaded ({:?}): {:?}", path, config);
         Ok(config)
     }
 
@@ -109,6 +113,9 @@ impl Configuration {
     }
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
+        if let Ok(env_path) = std::env::var("DISPLAY_SWITCH_CONFIG_FILE") {
+            return Ok(std::path::PathBuf::from(env_path));
+        }
         let config_dir = if cfg!(target_os = "macos") {
             dirs::preference_dir().ok_or_else(|| anyhow!("Config directory not found"))?
         } else {

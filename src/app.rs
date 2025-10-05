@@ -46,7 +46,7 @@ impl App {
             timestamp = env!("VERGEN_BUILD_TIMESTAMP"),
             git = env!("VERGEN_GIT_DESCRIBE"),
         );
-        let config = Configuration::load().context("failed to load configuration")?;
+        let config = Configuration::load(args.config_file_path.as_deref()).context("failed to load configuration")?;
 
         Ok(Self { config })
     }

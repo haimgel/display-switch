@@ -445,7 +445,7 @@ dependencies = [
 
 [[package]]
 name = "display_switch"
-version = "1.4.1"
+version = "1.5.0"
 dependencies = [
  "anyhow",
  "clap",
