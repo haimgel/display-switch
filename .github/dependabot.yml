@@ -19,3 +19,16 @@ updates:
           - "*"
     labels:
       - "dependencies"
+
+  - package-ecosystem: "cargo"
+    directory: "/"
+    assignees:
+      - "haimgel"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
