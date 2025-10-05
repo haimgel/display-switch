@@ -113,6 +113,9 @@ impl Configuration {
     }
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
+        if let Ok(env_path) = std::env::var("DISPLAY_SWITCH_CONFIG_FILE") {
+            return Ok(std::path::PathBuf::from(env_path));
+        }
         let config_dir = if cfg!(target_os = "macos") {
             dirs::preference_dir().ok_or_else(|| anyhow!("Config directory not found"))?
         } else {
