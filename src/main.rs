@@ -27,6 +27,10 @@ struct Args {
     /// Print debug information
     #[arg(short, long, default_value_t = false)]
     debug: bool,
+
+    /// Path to an alternative configuration file
+    #[arg(short = 'c', long = "config")]
+    config_file_path: Option<std::path::PathBuf>,
 }
 
 /// On Windows, re-attach the console, if parent process has the console. This allows
