@@ -322,7 +322,16 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba69f2c53e320fc4abad17cb02bbbf04d1a36f18e9907f347589ec5991b3c6c5"
 dependencies = [
- "mccs",
+ "mccs 0.1.3",
+]
+
+[[package]]
+name = "ddc"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1363c64a5107a51aa7a4198f7a0a61e3ae2347737ef26360dbd7f6025d6ee4f0"
+dependencies = [
+ "mccs 0.2.0",
 ]
 
 [[package]]
@@ -332,13 +341,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c6747b17c926a2aa34739b30f1a6cc726e3a7baf0e2f69a4c03a95cf5de94de"
 dependencies = [
  "anyhow",
- "ddc",
+ "ddc 0.2.2",
  "ddc-i2c",
  "ddc-macos",
  "ddc-winapi",
  "edid",
  "log",
- "mccs",
+ "mccs 0.1.3",
  "mccs-caps",
  "mccs-db",
  "nvapi",
@@ -350,7 +359,7 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ef18fac9fd5c11d0c7b85a80887b01f7361b49edb2b4627243928b90ce2691b"
 dependencies = [
- "ddc",
+ "ddc 0.2.2",
  "i2c",
  "i2c-linux",
  "resize-slice",
@@ -365,7 +374,7 @@ dependencies = [
  "core-foundation",
  "core-foundation-sys",
  "core-graphics",
- "ddc",
+ "ddc 0.2.2",
  "io-kit-sys",
  "mach2",
  "thiserror 1.0.69",
@@ -377,7 +386,7 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b65693556bdf54c77e0c82db4951686e4f030e7eb1c643d1bc781de2a4bce35"
 dependencies = [
- "ddc",
+ "ddc 0.2.2",
  "widestring",
  "winapi",
 ]
@@ -450,7 +459,7 @@ dependencies = [
  "anyhow",
  "clap",
  "config",
- "ddc",
+ "ddc 0.3.0",
  "ddc-hi",
  "ddc-i2c",
  "ddc-macos",
@@ -913,12 +922,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "mccs"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a63ab5297c9a7d5f8298a076b5f858c3c51ce84bf2f57a302d1d67ff9323360"
+
+[[package]]
 name = "mccs-caps"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8eb961d01a3bb07969cfa276be2ab88c31d0fefa77a872696832732d6e9ec094"
 dependencies = [
- "mccs",
+ "mccs 0.1.3",
  "nom",
 ]
 
@@ -928,7 +943,7 @@ version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3cdaa8fe19a1a1918becc1b8cbbbdc1058bc71411dff4de0a6ec6b5269f49d38"
 dependencies = [
- "mccs",
+ "mccs 0.1.3",
  "nom",
  "serde",
  "serde_derive",
