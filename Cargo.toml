@@ -22,7 +22,7 @@ ddc = "0.2"
 ddc-hi = "0.4"
 rusb = "0.9"
 shell-words = "1.1"
-clap = { version = "4.5.53", features = ["derive"] }
+clap = { version = "4.5.54", features = ["derive"] }
 
 [build-dependencies]
 vergen-git2 = { version = "1.0.0", features = ["build", "cargo"] }
