@@ -22,6 +22,26 @@ The app should function on MacOS, Windows, and Linux.
    brew install haimgel/tools/display_switch
    ```
 
+### Linux: device permissions
+
+Enable user access to I<sup>2</sup>C and input devices. Run as root:
+
+```bash
+groupadd i2c
+echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c"' >> /etc/udev/rules.d/10-local_i2c_group.rules
+groupadd uinput
+echo 'KERNEL=="uinput", GROUP="uinput", MODE="0660"' >> /etc/udev/rules.d/10-local_uinput_group.rules
+udevadm control --reload-rules && udevadm trigger
+```
+
+Then add your user to the i2c and uinput groups:
+
+```bash
+sudo usermod -aG i2c,uinput $(whoami)
+```
+
+And finally restart your session.
+
 ## Configuration
 
 The configuration is pretty similar on all platforms:
@@ -179,19 +199,6 @@ Copy built executable:
 
 ```bash
   cp target/release/display_switch /usr/local/bin/
-```
-Enable read/write access to i2c devices for users in `i2c` group. Run as root :
-
-```bash
-groupadd i2c
-echo 'KERNEL=="i2c-[0-9]*", GROUP="i2c"' >> /etc/udev/rules.d/10-local_i2c_group.rules
-udevadm control --reload-rules && udevadm trigger
-```
-
-Then add your user to the i2c group :
-
-```
-sudo usermod -aG i2c $(whoami)
 ```
 
 Create a systemd unit file in your user directory (`/home/$USER/.config/systemd/user/display-switch.service`) with contents

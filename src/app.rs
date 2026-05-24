@@ -22,7 +22,7 @@ impl usb::UsbCallback for App {
         if device_id == self.config.usb_device {
             info!("Monitored device ({:?}) is connected", &self.config.usb_device);
             std::thread::spawn(|| {
-                wake_displays().map_err(|err| error!("{:?}", err));
+                wake_displays().map_err(|err| warn!("Couldn't wake displays: {:?}", err));
             });
             display_control::switch(&self.config, SwitchDirection::Connect);
         }

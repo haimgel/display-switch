@@ -3,6 +3,7 @@
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
+use ddc_hi::VcpValue;
 use paste::paste;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer};
@@ -113,6 +114,13 @@ impl From<InputSource> for u16 {
 impl From<u16> for InputSource {
     fn from(value: u16) -> Self {
         Self::Raw(value).normalize()
+    }
+}
+
+impl From<VcpValue> for InputSource {
+    fn from(value: VcpValue) -> Self {
+        // Some VDUs don't zero the SNC high-byte like input source (0x60).
+        Self::from(value.sl as u16)
     }
 }
 
