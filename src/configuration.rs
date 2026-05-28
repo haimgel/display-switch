@@ -1,5 +1,6 @@
 //
 // Copyright © 2020 Haim Gelfenbeyn
+// Copyright © 2020 Luke Nuttall
 // This code is licensed under MIT license (see LICENSE.txt for details)
 //
 
@@ -35,6 +36,9 @@ struct PerMonitorConfiguration {
 pub struct Configuration {
     #[serde(deserialize_with = "Configuration::deserialize_usb_device")]
     pub usb_device: String,
+    #[serde(default)]
+    #[serde(deserialize_with = "Configuration::deserialize_always_switch")]
+    pub always_switch: bool,
     #[serde(flatten)]
     pub default_input_sources: InputSources,
     monitor1: Option<PerMonitorConfiguration>,
@@ -110,6 +114,14 @@ impl Configuration {
     {
         let s: String = Deserialize::deserialize(deserializer)?;
         Ok(s.to_lowercase())
+    }
+
+    fn deserialize_always_switch<'de, D>(deserializer: D) -> Result<bool, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let b: bool = Deserialize::deserialize(deserializer)?;
+        Ok(b)
     }
 
     pub fn config_file_name() -> Result<std::path::PathBuf> {
@@ -204,6 +216,45 @@ mod tests {
         .unwrap();
         assert_eq!(config.usb_device, "dead:beef")
     }
+
+    #[test]
+    fn test_always_switch_is_true_deserialization() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            always_switch = true
+            on_usb_connect = "DisplayPort2"
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.always_switch, true)
+    }
+
+    #[test]
+    fn test_always_switch_is_false_deserialization() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            always_switch = false
+            on_usb_connect = "DisplayPort2"
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.always_switch, false)
+    }
+
+    #[test]
+    fn test_always_switch_defaults_to_false_deserialization() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort2"
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.always_switch, false)
+    }
+
 
     #[test]
     fn test_symbolic_input_deserialization() {
