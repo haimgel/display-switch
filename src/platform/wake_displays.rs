@@ -40,6 +40,7 @@ pub fn wake_displays() -> Result<()> {
 
 #[cfg(target_os = "linux")]
 pub fn wake_displays() -> Result<()> {
+    use anyhow::Context;
     use std::{thread, time};
     use uinput::event::controller::Controller::Mouse;
     use uinput::event::controller::Mouse::Left;
@@ -47,7 +48,8 @@ pub fn wake_displays() -> Result<()> {
     use uinput::event::relative::Relative::Position;
     use uinput::event::Event::{Controller, Relative};
 
-    let mut device = uinput::default()?
+    let mut device = uinput::default()
+            .context("can't open default uinput device")?
             .name("display-switch")?
             // It's necessary to enable any mouse button. Otherwise Relative events would not work.
             .event(Controller(Mouse(Left)))?

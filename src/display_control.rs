@@ -8,13 +8,26 @@ use crate::input_source::InputSource;
 use anyhow::{Error, Result};
 use ddc_hi::{Ddc, Display, Handle};
 
+#[cfg(target_os = "linux")]
+use std::collections::HashMap;
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
 use std::{thread, time};
 
+#[cfg(target_os = "linux")]
+use std::ffi::OsStr;
+#[cfg(target_os = "linux")]
+use std::os::unix::fs::MetadataExt;
+#[cfg(target_os = "linux")]
+use std::sync::{Mutex, OnceLock};
+#[cfg(target_os = "linux")]
+use udev::DeviceType::CharacterDevice;
+
 /// VCP feature code for input select
 const INPUT_SELECT: u8 = 0x60;
 const RETRY_DELAY_MS: u64 = 3000;
+const GET_CURRENT_INPUT_RETRY_ATTEMPTS: usize = 5;
+const GET_CURRENT_INPUT_RETRY_DELAY_MS: u64 = 100;
 
 fn display_name(display: &Display, index: Option<usize>) -> String {
     // Different OSes populate different fields of ddc-hi-rs info structure differently. Create
@@ -47,8 +60,31 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
     displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
+fn get_current_input(handle: &mut Handle, display_name: &str) -> Result<ddc_hi::VcpValue> {
+    let retry_delay = time::Duration::from_millis(GET_CURRENT_INPUT_RETRY_DELAY_MS);
+
+    for attempt in 1.. {
+        match handle.get_vcp_feature(INPUT_SELECT) {
+            Ok(raw_source) => return Ok(raw_source),
+            Err(err) => {
+                if attempt >= GET_CURRENT_INPUT_RETRY_ATTEMPTS {
+                    return Err(err);
+                }
+
+                debug!(
+                    "Failed to get current input for display {} on attempt {}/{}: {:?}",
+                    display_name, attempt, GET_CURRENT_INPUT_RETRY_ATTEMPTS, err
+                );
+                thread::sleep(retry_delay);
+            }
+        }
+    }
+
+    unreachable!()
+}
+
 fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource) {
-    match handle.get_vcp_feature(INPUT_SELECT) {
+    match get_current_input(handle, display_name) {
         Ok(raw_source) => {
             if raw_source.value() & 0xff == input.value() {
                 info!("Display {} is already set to {}", display_name, input);
@@ -70,8 +106,75 @@ fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSourc
     }
 }
 
+#[cfg(target_os = "linux")]
+fn display_connector_name(display: &Display) -> Option<String> {
+    let Handle::I2cDevice(i2c) = &display.handle;
+    let file = i2c.inner_ref().inner_ref();
+    let devnum = file.metadata().ok()?.rdev();
+
+    let context = udev::Context::new().ok()?;
+    let mut device = context.device_from_devnum(CharacterDevice, devnum).ok()?;
+
+    loop {
+        if device.subsystem() == Some(OsStr::new("drm")) {
+            let name = device.sysname().to_str()?;
+            if name.starts_with("card") && name.contains('-') {
+                return Some(name.to_owned());
+            }
+        }
+
+        device = device.parent()?;
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn is_laptop_connector_name(name: &str) -> bool {
+    name.contains("-eDP-") || name.contains("-LVDS-")
+}
+
+#[cfg(target_os = "linux")]
+fn filtered_displays() -> Vec<Display> {
+    static SKIPPED_DISPLAYS: OnceLock<Mutex<HashMap<String, bool>>> = OnceLock::new();
+    let mut skipped_displays = SKIPPED_DISPLAYS
+        .get_or_init(|| Mutex::new(HashMap::new()))
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+
+    let mut displays = Vec::new();
+    for display in Display::enumerate() {
+        let display_id = display.info.id.clone();
+        if let Some(was_skipped) = skipped_displays.get(&display_id).copied() {
+            if !was_skipped {
+                displays.push(display);
+            }
+            continue;
+        }
+
+        let connector = display_connector_name(&display);
+        let is_skipped = connector.as_deref().is_some_and(is_laptop_connector_name);
+        skipped_displays.insert(display_id, is_skipped);
+        if !is_skipped {
+            displays.push(display);
+            continue;
+        }
+
+        info!(
+            "Skipping built-in laptop display {} on connector '{}'",
+            display_name(&display, None),
+            connector.unwrap(),
+        );
+    }
+
+    displays
+}
+
+#[cfg(not(target_os = "linux"))]
+fn filtered_displays() -> Vec<Display> {
+    Display::enumerate()
+}
+
 fn displays() -> Vec<Display> {
-    let displays = Display::enumerate();
+    let displays = filtered_displays();
     if !displays.is_empty() {
         return displays;
     }
@@ -85,7 +188,7 @@ fn displays() -> Vec<Display> {
         delay_duration.as_secs()
     );
     thread::sleep(delay_duration);
-    Display::enumerate()
+    filtered_displays()
 }
 
 pub fn log_current_source() {
@@ -97,9 +200,9 @@ pub fn log_current_source() {
     let unique_names = are_display_names_unique(&displays);
     for (index, mut display) in displays.into_iter().enumerate() {
         let display_name = display_name(&display, if unique_names { None } else { Some(index + 1) });
-        match display.handle.get_vcp_feature(INPUT_SELECT) {
+        match get_current_input(&mut display.handle, &display_name) {
             Ok(raw_source) => {
-                let source = InputSource::from(raw_source.value());
+                let source = InputSource::from(raw_source);
                 info!("Display {} is currently set to {}", display_name, source);
             }
             Err(err) => {
