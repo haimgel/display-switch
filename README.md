@@ -71,6 +71,35 @@ on_usb_connect = "hdmi2"
 _Tips for Windows_: monitors can be renamed in the Registry at
 `\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\DISPLAY\{MODEL_ID}\{CONNECTION_ID}`. Edit the `DeviceDesc` value and change the name after the last semicolon. This is especially helpful in case they are all just "Generic PnP Monitor".
 
+### Monitors that ignore the switch (`force_switch`)
+
+By default, `display-switch` reads a monitor's current input before writing, and skips the write if the monitor
+already reports the input you asked for. Some monitors report a **stale** input source when queried over a
+connection that is not the one currently being displayed: asked over DisplayPort 1 while actually displaying
+DisplayPort 2, they answer "DisplayPort 1". The write is then skipped and the monitor never switches.
+
+The symptom is asymmetric and easy to recognise in the log: switching *away* works, switching *back* does nothing,
+and the log says `is already set to` instead of `set to`:
+
+```
+[INFO] Display 'Generic PnP Monitor #1' is already set to DisplayPort1(0xf)
+```
+
+Set `force_switch` to skip the check and always issue the write:
+
+```ini
+usb_device = "1050:0407"
+on_usb_connect = "DisplayPort1"
+on_usb_disconnect = "DisplayPort2"
+force_switch = "true"
+```
+
+This works because the read and the write do not fail together — on affected monitors DDC writes over an inactive
+input are delivered correctly, and only reads are unreliable.
+
+`force_switch` defaults to `false`, since on monitors that report their input correctly the check is a useful
+optimization that avoids redundant writes.
+
 ### Running external commands
 `display-switch` supports running external commands upon connection or disconnection of USB devices. This configuration
 can be global (runs every time a configured USB device is connected or disconnected) or per-monitor (runs only when
