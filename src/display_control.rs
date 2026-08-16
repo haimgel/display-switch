@@ -115,6 +115,14 @@ pub fn log_current_source() {
 }
 
 pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
+    // Sleeping before enumerating (rather than just before writing) is deliberate: it also gives
+    // the OS a chance to finish re-enumerating displays after the topology change.
+    let switch_delay = config.switch_delay();
+    if !switch_delay.is_zero() {
+        debug!("Waiting {:?} before switching displays", switch_delay);
+        thread::sleep(switch_delay);
+    }
+
     let displays = displays();
     if displays.is_empty() {
         error!("Did not detect any DDC-compatible displays!");

@@ -7,6 +7,7 @@ use crate::input_source::InputSource;
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Deserializer};
 use std::fmt;
+use std::time::Duration;
 
 #[derive(Debug, Copy, Clone)]
 pub enum SwitchDirection {
@@ -43,6 +44,10 @@ pub struct Configuration {
     /// optimization skip switches that are in fact needed. Defaults to false.
     #[serde(default)]
     force_switch: Option<bool>,
+    /// How long to wait after a USB event before talking to the displays, in milliseconds.
+    /// USB re-enumeration and the DDC write can race with each other. Defaults to 0.
+    #[serde(default)]
+    switch_delay_ms: Option<u64>,
     monitor1: Option<PerMonitorConfiguration>,
     monitor2: Option<PerMonitorConfiguration>,
     monitor3: Option<PerMonitorConfiguration>,
@@ -153,6 +158,11 @@ impl Configuration {
     /// Whether to skip the read-before-write check and always issue the input source write.
     pub fn force_switch(&self) -> bool {
         self.force_switch.unwrap_or(false)
+    }
+
+    /// How long to wait after a USB event before talking to the displays.
+    pub fn switch_delay(&self) -> Duration {
+        Duration::from_millis(self.switch_delay_ms.unwrap_or(0))
     }
 
     pub fn configuration_for_monitor(&self, monitor_id: &str) -> InputSources {
@@ -296,6 +306,45 @@ mod tests {
         )
         .unwrap();
         assert!(config.force_switch());
+    }
+
+    #[test]
+    fn test_switch_delay_defaults_to_zero() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.switch_delay(), Duration::ZERO);
+    }
+
+    #[test]
+    fn test_switch_delay_deserialization() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+            switch_delay_ms = "1000"
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.switch_delay(), Duration::from_millis(1000));
+    }
+
+    #[test]
+    fn test_switch_delay_unquoted_deserialization() {
+        // The INI parser hands values over as strings, but unquoted values should work too.
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+            switch_delay_ms = 250
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.switch_delay(), Duration::from_millis(250));
     }
 
     #[test]

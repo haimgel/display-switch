@@ -100,6 +100,17 @@ input are delivered correctly, and only reads are unreliable.
 `force_switch` defaults to `false`, since on monitors that report their input correctly the check is a useful
 optimization that avoids redundant writes.
 
+### Delaying the switch (`switch_delay_ms`)
+
+USB re-enumeration and the DDC write can race with each other, and the OS may still be re-enumerating displays
+when the USB event arrives. `switch_delay_ms` waits before enumerating and switching:
+
+```ini
+switch_delay_ms = "1000"
+```
+
+Defaults to `0` (no delay). Increase it if switching is intermittent.
+
 ### Running external commands
 `display-switch` supports running external commands upon connection or disconnection of USB devices. This configuration
 can be global (runs every time a configured USB device is connected or disconnected) or per-monitor (runs only when
