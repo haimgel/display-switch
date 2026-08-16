@@ -7,6 +7,7 @@ use crate::input_source::InputSource;
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Deserializer};
 use std::fmt;
+use std::time::Duration;
 
 #[derive(Debug, Copy, Clone)]
 pub enum SwitchDirection {
@@ -37,6 +38,16 @@ pub struct Configuration {
     pub usb_device: String,
     #[serde(flatten)]
     pub default_input_sources: InputSources,
+    /// Always write the input source, instead of first reading it and skipping the write when it
+    /// already appears to hold the desired value. Some monitors report a stale input source when
+    /// queried over a connection that is not currently being displayed, which makes that
+    /// optimization skip switches that are in fact needed. Defaults to false.
+    #[serde(default)]
+    force_switch: Option<bool>,
+    /// How long to wait after a USB event before talking to the displays, in milliseconds.
+    /// USB re-enumeration and the DDC write can race with each other. Defaults to 0.
+    #[serde(default)]
+    switch_delay_ms: Option<u64>,
     monitor1: Option<PerMonitorConfiguration>,
     monitor2: Option<PerMonitorConfiguration>,
     monitor3: Option<PerMonitorConfiguration>,
@@ -144,6 +155,16 @@ impl Configuration {
         Ok(log_dir.join("display-switch.log"))
     }
 
+    /// Whether to skip the read-before-write check and always issue the input source write.
+    pub fn force_switch(&self) -> bool {
+        self.force_switch.unwrap_or(false)
+    }
+
+    /// How long to wait after a USB event before talking to the displays.
+    pub fn switch_delay(&self) -> Duration {
+        Duration::from_millis(self.switch_delay_ms.unwrap_or(0))
+    }
+
     pub fn configuration_for_monitor(&self, monitor_id: &str) -> InputSources {
         // Find a matching per-monitor config, if there is any
         let per_monitor_config = [
@@ -245,6 +266,98 @@ mod tests {
         .unwrap();
         assert_eq!(config.default_input_sources.on_usb_connect.unwrap().value(), 0x10);
         assert_eq!(config.default_input_sources.on_usb_disconnect.unwrap().value(), 0x20);
+    }
+
+    #[test]
+    fn test_force_switch_defaults_to_off() {
+        // Existing configurations must keep the previous behavior: read before writing.
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+        "#,
+        )
+        .unwrap();
+        assert!(!config.force_switch());
+    }
+
+    #[test]
+    fn test_force_switch_deserialization() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+            force_switch = "true"
+        "#,
+        )
+        .unwrap();
+        assert!(config.force_switch());
+    }
+
+    #[test]
+    fn test_force_switch_unquoted_deserialization() {
+        // The INI parser hands values over as strings, but unquoted values should work too.
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+            force_switch = true
+        "#,
+        )
+        .unwrap();
+        assert!(config.force_switch());
+    }
+
+    #[test]
+    fn test_switch_delay_defaults_to_zero() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.switch_delay(), Duration::ZERO);
+    }
+
+    #[test]
+    fn test_switch_delay_deserialization() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+            switch_delay_ms = "1000"
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.switch_delay(), Duration::from_millis(1000));
+    }
+
+    #[test]
+    fn test_switch_delay_unquoted_deserialization() {
+        // The INI parser hands values over as strings, but unquoted values should work too.
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+            switch_delay_ms = 250
+        "#,
+        )
+        .unwrap();
+        assert_eq!(config.switch_delay(), Duration::from_millis(250));
+    }
+
+    #[test]
+    fn test_force_switch_can_be_explicitly_disabled() {
+        let config = load_test_config(
+            r#"
+            usb_device = "dead:BEEF"
+            on_usb_connect = "DisplayPort1"
+            force_switch = "false"
+        "#,
+        )
+        .unwrap();
+        assert!(!config.force_switch());
     }
 
     #[test]

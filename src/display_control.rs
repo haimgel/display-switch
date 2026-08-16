@@ -47,16 +47,21 @@ fn are_display_names_unique(displays: &[Display]) -> bool {
     displays.iter().all(|display| hash.insert(display_name(display, None)))
 }
 
-fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource) {
-    match handle.get_vcp_feature(INPUT_SELECT) {
-        Ok(raw_source) => {
-            if raw_source.value() & 0xff == input.value() {
-                info!("Display {} is already set to {}", display_name, input);
-                return;
+fn try_switch_display(handle: &mut Handle, display_name: &str, input: InputSource, force_switch: bool) {
+    // Some monitors report a stale input source when queried over a connection that is not
+    // currently being displayed, which makes this check skip switches that are in fact needed.
+    // "force_switch" writes unconditionally instead.
+    if !force_switch {
+        match handle.get_vcp_feature(INPUT_SELECT) {
+            Ok(raw_source) => {
+                if raw_source.value() & 0xff == input.value() {
+                    info!("Display {} is already set to {}", display_name, input);
+                    return;
+                }
             }
-        }
-        Err(err) => {
-            warn!("Failed to get current input for display {}: {:?}", display_name, err);
+            Err(err) => {
+                warn!("Failed to get current input for display {}: {:?}", display_name, err);
+            }
         }
     }
     debug!("Setting display {} to {}", display_name, input);
@@ -110,6 +115,14 @@ pub fn log_current_source() {
 }
 
 pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
+    // Sleeping before enumerating (rather than just before writing) is deliberate: it also gives
+    // the OS a chance to finish re-enumerating displays after the topology change.
+    let switch_delay = config.switch_delay();
+    if !switch_delay.is_zero() {
+        debug!("Waiting {:?} before switching displays", switch_delay);
+        thread::sleep(switch_delay);
+    }
+
     let displays = displays();
     if displays.is_empty() {
         error!("Did not detect any DDC-compatible displays!");
@@ -121,7 +134,7 @@ pub fn switch(config: &Configuration, switch_direction: SwitchDirection) {
         let input_sources = config.configuration_for_monitor(&display_name);
         debug!("Input sources found for display {}: {:?}", display_name, input_sources);
         if let Some(input) = input_sources.source(switch_direction) {
-            try_switch_display(&mut display.handle, &display_name, input);
+            try_switch_display(&mut display.handle, &display_name, input, config.force_switch());
         } else {
             info!(
                 "Display {} is not configured to switch on USB {}",
