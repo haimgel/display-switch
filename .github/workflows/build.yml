@@ -22,7 +22,7 @@ jobs:
     name: Extract crate metadata
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
       - name: Extract crate information
         id: meta
         run: |
@@ -60,9 +60,9 @@ jobs:
         run: |
           choco install zip -y
 
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
-      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 #v2.9.1
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 #v2.9.2
 
       - name: Build
         run: make build-release
@@ -97,7 +97,7 @@ jobs:
           path: ${{ steps.package.outputs.PACKAGE_FILE }}
 
       - name: Release
-        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b #v3.0.1
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 #v3.0.2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           prerelease: ${{ contains(github.ref, 'prerelease') }}
@@ -114,9 +114,9 @@ jobs:
     needs: [meta, build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
       - name: Update Homebrew formula
-        uses: mislav/bump-homebrew-formula-action@ccf2332299a883f6af50a1d2d41e5df7904dd769 #v3
+        uses: mislav/bump-homebrew-formula-action@f865c8b0dbebd6e263cc06782a0e974c61cf12d2 #v3
         if: startsWith(github.ref, 'refs/tags/')
         with:
           formula-name: display_switch
